@@ -1,0 +1,13 @@
+eclipse.preferences.version=1
+encoding//WebContent/WEB-INF/jsp/ckfinder/ckfinder.jsp=UTF-8
+encoding//WebContent/WEB-INF/jsp/error/403.jsp=UTF-8
+encoding//WebContent/WEB-INF/templates/admin/footer.jsp=UTF-8
+encoding//WebContent/WEB-INF/templates/admin/header.jsp=UTF-8
+encoding//WebContent/WEB-INF/templates/admin/left-bar.jsp=UTF-8
+encoding//WebContent/error.jsp=UTF-8
+encoding//src/constant/Defines.java=UTF-8
+encoding//src/controller/AdminThongKeController.java=UTF-8
+encoding//src/controller/AdminUserController.java=UTF-8
+encoding//src/controller/PublicController.java=UTF-8
+encoding//src/controller/PublicProductController.java=UTF-8
+encoding//src/util/GMailUtil.java=UTF-8
