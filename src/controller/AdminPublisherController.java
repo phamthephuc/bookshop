@@ -39,15 +39,19 @@ public class AdminPublisherController {
 	
 	
 	@RequestMapping(value="/publisher/add",method=RequestMethod.POST)
-	public String cat(@Valid @ModelAttribute("publisher") Publisher publisher,BindingResult br,RedirectAttributes ra,ModelMap modelMap) {
+	public String add(@Valid @ModelAttribute("publisher") Publisher publisher,BindingResult br,RedirectAttributes ra,ModelMap modelMap) {
 		if(br.hasErrors()) {
 			modelMap.addAttribute("publisher", publisher);
 			return "admin.publisher.add";
 		}
-		if (publisherDao.addPublisher(publisher) > 0) {
-			ra.addFlashAttribute("msg", Defines.SUCCESS);
-		}else {
-			ra.addFlashAttribute("msg", Defines.ERROR);
+		if (publisherDao.getPublisherByName(publisher.getName()) == null) {
+			if (publisherDao.addPublisher(publisher) > 0) {
+				ra.addFlashAttribute("msg", Defines.SUCCESS);
+			}else {
+				ra.addFlashAttribute("msg", Defines.ERROR);
+			}
+		} else {
+			ra.addFlashAttribute("msg", "TÊN NHÀ PHÁT HÀNH ĐÃ TỒN TẠI");
 		}
 		
 		return "redirect:/admin/publishers";
@@ -77,13 +81,16 @@ public class AdminPublisherController {
 			modelMap.addAttribute("publisher", publisher);
 			return "admin.publisher.edit";
 		}
-		publisher.setPid(id);
-		if(publisherDao.editItem(publisher)>0) {
-			ra.addFlashAttribute("msg", Defines.SUCCESS);
-		}else {
-			ra.addFlashAttribute("msg", Defines.ERROR);
+		if (publisherDao.getPublisherByName(publisher.getName()) == null) {
+			publisher.setPid(id);
+			if(publisherDao.editItem(publisher)>0) {
+				ra.addFlashAttribute("msg", Defines.SUCCESS);
+			}else {
+				ra.addFlashAttribute("msg", Defines.ERROR);
+			}
+		} else {
+			ra.addFlashAttribute("msg", "TÊN NHÀ PHÁT HÀNH ĐÃ TỒN TẠI");
 		}
-		
 		return "redirect:/admin/publishers";
 			
 	}

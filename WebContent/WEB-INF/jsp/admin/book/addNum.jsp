@@ -6,7 +6,7 @@
 				<!-- input-forms -->
 				<div class="grids">
 					<div class="progressbar-heading grids-heading">
-						<h2>THÊM SỐ LƯỢNG CHO SẢN PHẨM  ${pro.name_pro }</h2>
+						<h2>THÊM SỐ LƯỢNG CHO SẢN PHẨM  ${book.book_name }</h2>
 					</div>
 					<div class="panel panel-widget forms-panel">
 						<div class="forms">
@@ -20,7 +20,7 @@
 											<label for="exampleInputEmail1">Số lượng bạn muốn thêm</label> 
 											<input type="number" step="1" name="numAdd" class="form-control" id="exampleInputEmail1" placeholder="số lượng" required="required" min="0" requiredmsg="Trường này là số lớn hơn 0">
 										</div> 
-										<button type="submit" class="btn btn-default w3ls-button">Submit</button> 
+										<button type="submit" class="btn btn-default w3ls-button">Xác nhận</button> 
 									</form> 
 								</div>
 							</div>

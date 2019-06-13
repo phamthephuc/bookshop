@@ -39,7 +39,7 @@
 							<td>${order.phone }</td>
 							<td>${order.email }</td>
 							<td>${order.address_ship }</td>
-							<td>${order.amount }</td>
+							<td><fmt:formatNumber type="number" value='${order.amount }'/>đ</td>
 							<td>${order.name_payment }</td>
 							<td>${order.message }</td>
 							<td>${order.date_create_order }</td>

@@ -151,6 +151,12 @@ public class Book {
 	public void setIs_active(boolean is_active) {
 		this.is_active = is_active;
 	}
+	
+	public boolean getIs_active() {
+		return is_active;
+	}
+
+	
 	public String getAuthor_name() {
 		return author_name;
 	}

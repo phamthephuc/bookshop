@@ -90,9 +90,15 @@
 							</div>
 						</div>
 						<div class="image">
-							<div class="number">${firstOfGroup}</div>
+							<c:choose>
+								<c:when test="${firstOfGroup <= 3}">
+									<div class="number">${firstOfGroup}</div>
+								</c:when>
+								<c:otherwise><div class="number2">${firstOfGroup}</div></c:otherwise>
+							</c:choose>
+							
 							<c:set value="${firstOfGroup + 1}" var="firstOfGroup"></c:set>
-							<a href="/2311/boxset-2013.html"
+							<a href="${pageContext.request.contextPath}/sach-truyen/${objBook.bid}/${slugUtil.makeSlug(objBook.book_name)}.html"
 								title="${objBook.book_name}"><img width="120"
 								height="168"
 								src="${pageContext.request.contextPath}/files/${objBook.picture}"

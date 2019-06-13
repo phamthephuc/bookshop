@@ -6,7 +6,7 @@
 				<!-- input-forms -->
 				<div class="grids">
 					<div class="progressbar-heading grids-heading">
-						<h2>SỬA NHÀ XUẤT BẢN</h2>
+						<h2>SỬA NHÀ PHÁT HÀNH</h2>
 					</div>
 					<div class="panel panel-widget forms-panel">
 						<div class="forms">
@@ -17,10 +17,10 @@
 								<div class="form-body">
 									<form action="" method="post"> 
 										<div class="form-group"> 
-											<label for="exampleInputEmail1">Tên Nhà Xuất Bản</label> 
+											<label for="exampleInputEmail1">Tên Nhà Phát Hành</label> 
 											<input type="text" name="name" class="form-control" id="exampleInputEmail1" placeholder="tên nhà xuất bản" required="required" minlength="5" maxlength="200"  requiredmsg="Trường này có từ 5 đến 200 ký tự" value="${publisher.name }">
 										</div> 
-										<button type="submit" class="btn btn-default w3ls-button">Submit</button> 
+										<button type="submit" class="btn btn-default w3ls-button">Xác Nhận</button> 
 									</form> 
 								</div>
 							</div>

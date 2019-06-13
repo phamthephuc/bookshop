@@ -107,6 +107,13 @@
 					sumMoney = data.sumMoney;
 					retainMoney = data.retainMoney;
 					numProduct = data.numProduct;
+					haveErrorNumber = data.haveErrorNumber;
+					if (haveErrorNumber) {
+						$('#errorNumber').removeClass('hidein');
+					} else {
+						$('#errorNumber').addClass('hidein');
+					}
+					
 					$("#cart-intoMoney"+productid).empty();
 					$("#cart-intoMoney"+productid).append(retainMoney + ' đ');
 					$("#cartnumber").empty();
@@ -137,6 +144,44 @@
 			});
 		}
 	}
+	
+	
+	
+	function huyDonHang(orderId)
+	{
+		//var name = productid;
+		if(orderId !== '') {
+			address = '${pageContext.request.contextPath}/huy-don-hang';
+			$.ajax({
+						url : address,
+						dataType : "html",
+						type : "POST",
+						cache : false,
+						data : {
+							orderId : orderId
+						},
+						error : function(e) {
+							Boxy.alert('Lỗi ajax', null, {
+								title : 'Lỗi'
+							});
+							return false;
+						},
+						success : function(data) {
+							if (data != "OK") {
+								Boxy.alert('Bạn không có quyền thay đổi đơn hàng này', null, {
+									title : 'Lỗi'
+								});
+								return false;
+							} else {
+								$('#cancelOrder' + orderId).empty();
+								$('#statusOrder' + orderId).empty();
+								$('#statusOrder' + orderId).append('Đã hủy');
+							}
+						}
+					});
+		}
+	}
+	
 	function changequantity(type, productid, value, cid)
 	{
 		//var name = productid;
@@ -293,30 +338,18 @@
 							<ul>
 								<li><a href="#" title="Về nobita" target="_self">Về
 										GreenBooks</a></li>
-								<li><a href="#" title="Tuyển dụng" target="_self">Tuyển
-										dụng</a></li>
 							</ul>
 						</li>
 						<li class="group">Tài khoản
 							<ul>
-								<li><a href="" title="Tài khoản" target="_self">Tài
-										khoản</a></li>
 								<li><a href="" title="Danh sách đơn hàng" target="_self">Danh
 										sách đơn hàng</a></li>
-								<li><a href="" title="Thông báo" target="_self">Thông
-										báo</a></li>
 							</ul>
 						</li>
 						<li class="group">Hướng dẫn
 							<ul>
 								<li><a href="" title="Hướng dẫn mua hàng" target="_self">Hướng
 										dẫn mua hàng</a></li>
-								<li><a href="" title="Phương thức thanh toán"
-									target="_self">Phương thức thanh toán</a></li>
-								<li><a href="" title="Câu hỏi thường gặp" target="_self">Câu
-										hỏi thường gặp</a></li>
-								<li><a href="" title="Phương thức vận chuyển"
-									target="_self">Phương thức vận chuyển</a></li>
 							</ul>
 						</li>
 					</ul>
@@ -328,7 +361,7 @@
 		<div class="footer_address">
 			<div class="block " id="content_FooterAddress">
 				<div class="blockcontent">
-					<div style="text-align: center;">Copyright &copy; 2017 Green
+					<div style="text-align: center;">Copyright &copy; 2019 Green
 						Books</div>
 					<div style="text-align: center;">&nbsp;</div>
 					<div style="text-align: center;">Địa chỉ: <a href="https://www.facebook.com/vy.leba">K856/H37/08 Tôn Đức Thắng,
@@ -339,7 +372,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="homecoupon">
+<!-- 	<div class="homecoupon">
 		<div class="titlebar">
 			<div class="fleft">Nhiều ưu đãi hấp dẫn đang chờ bạn</div>
 			<div class="fright">
@@ -361,10 +394,10 @@
 			<span id="help1"></span> <input type="hidden"
 				name="C89bebf2de67ef5b5f19651230e7e2303" value="1" />
 		</form>
-	</div>
-	<div class="coupon">
+	</div> -->
+<!-- 	<div class="coupon">
 		<a href="javascript:" onclick="showdialog(1)">Ưu đãi</a>
-	</div>
+	</div> -->
 	<div id="bttop" class="bttop">
 		<i class="fa fa-arrow-up"></i>
 	</div>

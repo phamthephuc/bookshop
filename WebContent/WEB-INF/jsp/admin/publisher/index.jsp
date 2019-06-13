@@ -6,7 +6,7 @@
 				<!-- tables -->
 				
 				<div class="table-heading">
-					<h2>Danh sách Nhà Xuất Bản</h2>
+					<h2>Danh sách Nhà PHÁT HÀNH</h2>
 					<c:if test="${not empty msg }">
 						<h3 style="text-align: center;" class="label label-success">${msg }</h3>
 					</c:if>
@@ -20,7 +20,7 @@
 						<thead>
 						  <tr>
 							<th>ID</th>
-							<th>Tên nhà xuất bản</th>
+							<th>Tên Nhà Phát Hành</th>
 							<th >Chức năng</th>
 						  </tr>
 						</thead>

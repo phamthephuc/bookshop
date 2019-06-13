@@ -7,7 +7,7 @@ public class Defines {
 	public static final String SUCCESS = "Xử lý thành công"; 
 	public static final String ERROR = "Có lỗi xảy ra"; 
 	public static final String NOT_ALLOWED = "Không có quyền thực hiện chức năng";
-	public static final int ROW_COUNT = 2;
+	public static final int ROW_COUNT = 20;
 	public static final String DIR_UPLOAD = "files"; 
 	public static final int MAX_BOOK_SHOW = 20;
 	public static final String orderingByPrice = "price";

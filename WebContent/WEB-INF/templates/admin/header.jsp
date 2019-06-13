@@ -3,16 +3,14 @@
 <%@include file="/templates/taglib.jsp" %>
 <section class="title-bar">
 			<div class="logo">
-				<h1><a href="${pageContext.request.contextPath }/admin"><img src="${pageContext.request.contextPath }/templates/admin/images/logo.png" alt="" />Colored</a></h1>
+				<h1><a href="${pageContext.request.contextPath }/admin"><img src="${pageContext.request.contextPath }/templates/public/nobita.vn/stores/images/logo.png" alt="" /></a></h1>
 			</div>
 			<div class="full-screen">
-				<section class="full-top">
-					<button id="toggle"><i class="fa fa-arrows-alt" aria-hidden="true"></i></button>	
-				</section>
 			</div>
 			<div class="w3l_search">
-				<form action="${pageContext.request.contextPath }/admin/search" method="post">
-					<input type="text" name="key" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}" required="">
+				<form action="${pageContext.request.contextPath }/admin/books" method="post">
+					<input type="text" name="key" 
+					required minlength="1" maxlength="200" requiredmsg="Bạn cần nhập từ khóa vào đây">
 					<button class="btn btn-default" type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
 				</form>
 			</div>

@@ -75,7 +75,7 @@ if(${err eq 3}) alert("LỖI! Bạn chưa thanh toán, vui lòng kiểm tra lạ
 								</div>
 								<div class="field">
 									<div class="textlabel">
-										<label for="street">Lời nhắn</label> <span class="Required">*</span>:
+										<label for="street">Lời nhắn</label>:
 									</div>
 									<textarea cols="82" style="width: 85%;"
 										placeholder="Nhập lời nhắn của bạn" name="message"

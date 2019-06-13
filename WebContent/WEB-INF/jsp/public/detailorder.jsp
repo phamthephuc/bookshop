@@ -105,14 +105,18 @@
 									<td></td>
 									<td style="padding: 4px 0" align="right" colspan="2">Phí
 										vận chuyển:</td>
-									<td align="right"><c:if test="${total >= freeShipPrice}">${shipFee}</c:if> ₫</td>
+									<td align="right">
+									<c:if test="${total < freeShipPrice}" >${shipFee} ₫
+									</c:if>
+									<c:if test="${total >= freeShipPrice}">Miễn phí</c:if>
+									</td>
 									
 								</tr>
 								<tr>
 									<td></td>
 									<td style="padding: 4px 0" align="right" colspan="2"><strong>Tổng
 											tiền:</strong></td>
-									<c:if test="${total >= freeShipPrice}">
+									<c:if test="${total < freeShipPrice}">
 										<c:set value="${total + shipFee }" var="total"></c:set>
 									</c:if>
 									<td align="right"><strong><fmt:formatNumber type="number"

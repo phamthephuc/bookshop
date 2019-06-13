@@ -19,7 +19,6 @@ import constant.Defines;
 import model.bean.Category;
 import model.bean.Order;
 import model.dao.CategoryDao;
-import model.dao.ContactDao;
 import model.dao.OrderDao;
 
 @Controller
@@ -32,8 +31,7 @@ public class AdminCatController {
 	
 	@Autowired
 	private OrderDao orderDao;
-	@Autowired
-	private ContactDao contactDao;
+
 	@ModelAttribute
 	public void commonObjects(ModelMap modelMap) {
 		modelMap.addAttribute("Defines", defines);
@@ -95,7 +93,7 @@ public class AdminCatController {
 	@RequestMapping("/cat/edit/{id}")
 	public String edit(ModelMap modelMap,@PathVariable("id") int id) {
 		modelMap.addAttribute("cat", catDao.getItem(id));
-		modelMap.addAttribute("listCatParents", catDao.getItemsParent());
+		modelMap.addAttribute("listCatParents", catDao.getItemsParentDifferentCurrentId(id));
 		return "admin.cat.edit";
 	}
 	

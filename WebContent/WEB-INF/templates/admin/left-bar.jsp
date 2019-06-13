@@ -29,6 +29,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 <script src="${pageContext.request.contextPath }/templates/admin/js/modernizr.js"></script>
 <script src="${pageContext.request.contextPath }/templates/admin/js/jquery.cookie.js"></script>
 <script src="${pageContext.request.contextPath }/templates/admin/js/screenfull.js"></script>
+<script src="${pageContext.request.contextPath }/libraries/ckeditor/ckeditor.js"></script>
 		<script>
 		$(function () {
 			$('#supported').text('Supported/allowed: ' + !!screenfull.enabled);
@@ -66,7 +67,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 			</li>
 			<li>
 				<a href="${pageContext.request.contextPath }/admin/books">
-					<i class="icon-fa fa-gift nav-icon"></i>
+					<i class="fa fa-book nav-icon"></i>
 					<span class="nav-text">
 						Sách
 					</span>
@@ -90,7 +91,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 			</li>
 			<li>
 				<a href="${pageContext.request.contextPath }/admin/thong-ke">
-					<i class="icon-fa fa-tags nav-icon"></i>
+					<i class="fa fa-bar-chart nav-icon"></i>
 					<span class="nav-text">
 						Thống kê
 					</span>
@@ -109,14 +110,6 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 					<i class="icon-fa fa-users nav-icon"></i>
 					<span class="nav-text">
 						Nhà xuất bản
-					</span>
-				</a>
-			</li>
-			<li>
-				<a href="${pageContext.request.contextPath }/admin/contacts">
-					<i class="icon-fa fa-credit-card nav-icon"></i>
-					<span class="nav-text">
-						Liên hệ
 					</span>
 				</a>
 			</li>

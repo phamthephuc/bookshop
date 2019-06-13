@@ -6,7 +6,7 @@
 				<!-- input-forms -->
 				<div class="grids">
 					<div class="progressbar-heading grids-heading">
-						<h2>THÊM SẢN PHẨM</h2>
+						<h2>THÊM SÁCH</h2>
 					</div>
 					<div class="panel panel-widget forms-panel">
 						<div class="forms">
@@ -51,7 +51,7 @@
 											<input type="date" name="realease_date" class="form-control" required="date" requiredmsg="Trường này cần là định dạng ngày">
 											<input type="hidden" value="true" hidden="hidden" name="is_active" class="form-control" required="date" requiredmsg="Trường này cần là định dạng ngày">
 											<label for="exampleInputEmail1">Mô tả</label> 
-											<textarea name="preview"  class="form-control"  required="required" minlength="20" maxlength="2000"  requiredmsg="Trường này có từ 20 đến 2000 ký tự"></textarea>
+											<textarea id="ckeditor" name="preview" class="form-control"  required="required" minlength="20" maxlength="2000"  requiredmsg="Trường này có từ 20 đến 2000 ký tự"></textarea>
 											<label for="exampleInputEmail1">Hình ảnh</label> 
 											<input type="file" name="hinh" class="form-control" id="exampleInputEmail1" placeholder="tên danh mục" required="required" requiredmsg="Trường này là bắt buộc">
 										</div> 

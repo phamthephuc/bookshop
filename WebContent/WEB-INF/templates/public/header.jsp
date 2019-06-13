@@ -30,6 +30,11 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/templates/public/nobita.vn/layouts/system/css/boxy.css"
 	type="text/css" />
+<style>
+	.hidein {
+		display: none !important;
+	}
+</style>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/templates/public/nobita.vn/layouts/system/js/jquery-1.8.2.min.js"></script>
 <script

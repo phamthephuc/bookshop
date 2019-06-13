@@ -76,23 +76,32 @@
 													</tr>
 												</thead>
 												<tbody>
+													<% float total = 0; %>
 													<c:forEach items="${listDetailOrder }" var="detailOrder">
 														<tr>
 															<td>${detailOrder.id_detailOrder }</td>
 															<td>${detailOrder.name_pro }</td>
 															<td>${detailOrder.qty }</td>
-															<td>${detailOrder.price }</td>
-															<td>${detailOrder.price - detailOrder.price/100*detailOrder.sale }</td>
+															<td><fmt:formatNumber type="number" value='${slugUtil.formatPrice(detailOrder.price) }'/>đ</td>
+															<td><fmt:formatNumber type="number" value='${slugUtil.formatPrice(detailOrder.price - detailOrder.price/100*detailOrder.sale) }'/>đ</td>
 														</tr>
+														<c:set value="${slugUtil.formatPrice(detailOrder.price - detailOrder.price/100*detailOrder.sale)}" var="promo_price"></c:set>
+														<c:set var="total" value="${total + (promo_price * detailOrder.qty ) }"></c:set>	
 													</c:forEach>
 												</tbody>
 											</table>
 											<br>
-											<div style="color:green;float: right" >Tổng tiền : ${order.amount }</div><br>
+											<div style="color:green;float: right" >Tiền vận chuyển : 
+												<c:if test="${total < freeShipPrice}" ><fmt:formatNumber type="number" value='${shipFee}'/>₫</c:if>
+												<c:if test="${total >= freeShipPrice}">Miễn phí</c:if></td>
+											</div><br>
+											<div style="color:green;float: right" >Tổng tiền : <fmt:formatNumber type="number" value='${slugUtil.formatPrice(order.amount) }'/>đ</div><br>
 										</div>
 									</div>
 								</div>
-								<button type="submit" class="btn btn-default w3ls-button">Lưu</button>
+								<c:if test="${order.id_status != 2 && order.id_status != 4 }">
+									<button type="submit" class="btn btn-default w3ls-button">Lưu</button>
+								</c:if>
 							</form>
 						</div>
 					</div>

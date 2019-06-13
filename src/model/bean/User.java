@@ -29,7 +29,7 @@ public class User {
 	@Size(min=6,max=2000)
 	private String address;
 	
-	@Size(min=10,max=12)
+	@Size(min=10,max=11)
 	private String phone;
 	
 	public String getPhone() {

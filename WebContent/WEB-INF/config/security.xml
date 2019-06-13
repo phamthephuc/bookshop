@@ -15,18 +15,26 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans
 		<intercept-url pattern="/admin/slides" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
 		<intercept-url pattern="/admin/slide/**" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
 		<intercept-url pattern="/admin/cats" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
-		<intercept-url pattern="/admin/pros" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
+		<intercept-url pattern="/admin/books" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
 		
-		<intercept-url pattern="/admin/pro/addNum/**" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
-		<intercept-url pattern="/admin/pro/add" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
-		<intercept-url pattern="/admin/pro/edit/**" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/admin/authors" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
+		<intercept-url pattern="/admin/author/add" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
+		<intercept-url pattern="/admin/author/edit/**" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
+		
+		<intercept-url pattern="/admin/publishers" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
+		<intercept-url pattern="/admin/publisher/add" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
+		<intercept-url pattern="/admin/publisher/edit/**" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
+		
+		<intercept-url pattern="/admin/book/addNum/**" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
+		<intercept-url pattern="/admin/book/add" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
+		<intercept-url pattern="/admin/book/edit/**" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
 		<intercept-url pattern="/admin/thong-ke" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/admin/pro/del/**" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/admin/book/del/**" access="hasAnyRole('ROLE_EDITOR','ROLE_ADMIN')" />
 		<intercept-url pattern="/admin/cat/add" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
 		<intercept-url pattern="/admin/cat/edit/**" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
 		
 		
-		<intercept-url pattern="/admin/user/edit/**" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')" />
+		<intercept-url pattern="/admin/user/edit/**" access="hasAnyRole('ROLE_ADMIN')" />
 		
 		<intercept-url pattern="/admin/" access="hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN', 'ROLE_USER')" />
         <intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />

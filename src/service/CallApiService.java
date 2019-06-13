@@ -35,7 +35,11 @@ public class CallApiService {
                 headers.add("passcode", passcode);
                 HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity =
                         new HttpEntity<>(params, headers);
-                ResponseEntity<PostApiResponse> responseEntity = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, PostApiResponse.class);
+                try {
+                	ResponseEntity<PostApiResponse> responseEntity = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, PostApiResponse.class);
+                } catch (Exception e) {
+					// TODO: handle exception
+				}
                 System.out.println(requestEntity.getBody().toString());
             }
         }).start();

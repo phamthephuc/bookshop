@@ -23,7 +23,7 @@ public class OrderDao {
 	
 	
 	public int countItemChuaXuLy() {
-		String sql = "SELECT COUNT(*) AS countItem FROM orders WHERE id_status = 1 || id_status = 3";
+		String sql = "SELECT COUNT(*) AS countItem FROM orders WHERE id_status = 0";
 		return jdbcTemplate.queryForObject(sql, Integer.class);
 	}
 	
@@ -50,7 +50,7 @@ public class OrderDao {
 	}
 	
 	public List<Order> getItemsChuaXuLyNotLimit(){
-		String sql = "SELECT orders.*,payment.name as name_payment,status.name_status AS name_status FROM orders INNER JOIN status ON orders.id_status = status.id_status INNER JOIN payment ON payment.id = orders.id_payment WHERE status.id_status = 1 || status.id_status = 3 ORDER BY id_order DESC";
+		String sql = "SELECT orders.*,payment.name as name_payment,status.name_status AS name_status FROM orders INNER JOIN status ON orders.id_status = status.id_status INNER JOIN payment ON payment.id = orders.id_payment WHERE status.id_status = 0 ORDER BY id_order DESC";
 		return jdbcTemplate.query(sql, new BeanPropertyRowMapper<Order>(Order.class));
 	}
 	
@@ -60,6 +60,7 @@ public class OrderDao {
 	}
 
 	public int addItem(Order order) {
+		System.out.println(order.getPhone());
 		String sql = "INSERT INTO orders(id_user,fullname,email,phone,address_ship,amount,id_payment,message,id_status) VALUES(?,?,?,?,?,?,?,?,?)";
 		return jdbcTemplate.update(sql, new Object[] {order.getId_user(),order.getFullname(),order.getEmail(),order.getPhone(),order.getAddress_ship(),order.getAmount(),order.getId_payment(),order.getMessage(),order.getId_status()});
 	}
@@ -86,9 +87,9 @@ public class OrderDao {
 		return jdbcTemplate.update(sql, new Object[] {order.getId_status(),order.getId_order()});
 	}
 	
-	public int huyDonHang(int id) {
-		String sql = "UPDATE orders SET id_status = 2 WHERE id_order = ?";
-		return jdbcTemplate.update(sql, new Object[] {id});
+	public int huyDonHang(int id, int userId) {
+		String sql = "UPDATE orders SET id_status = 2 WHERE id_order = ? AND id_status = 0 AND id_user = ?";
+		return jdbcTemplate.update(sql, new Object[] {id, userId});
 	}
 
 

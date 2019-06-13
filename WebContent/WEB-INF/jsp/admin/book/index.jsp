@@ -6,7 +6,7 @@
 				<!-- tables -->
 				
 				<div class="table-heading">
-					<h2>Sản Phẩm</h2>
+					<h2>Sách</h2>
 					<c:if test="${not empty msg }">
 						<h3 style="text-align: center;" class="label label-success">${msg }</h3>
 					</c:if>
@@ -40,14 +40,19 @@
 							<td>${book.category_name }</td>
 							<td>${book.author_name}</td>
 							<td>${book.publisher_name }</td>
-							<td>${book.price }</td>
-							<td>${book.price - book.price * book.sale / 100 }</td>
+							<td><fmt:formatNumber type="number" value='${book.price }'/>đ</td>
+							<td><fmt:formatNumber type="number" value='${book.price - book.price * book.sale / 100 }'/>đ</td>
 							<fmt:formatDate value="${book.realease_date}" var="dateFormat" pattern="dd/MM/yyyy"/>
 							<td>${dateFormat}</td>
 							<td ><img width="100px" src="${pageContext.request.contextPath}/files/${book.picture }"></td>
 							<td>${book.number_rest}</td>
 							<td>${book.pages}</td>
-							<td>${book.is_active}</td>
+							<td>
+								<c:choose>
+									<c:when test="${book.is_active == true }">Đang Hiện</c:when>
+									<c:otherwise>Đang Ẩn</c:otherwise>
+								</c:choose>
+							</td>
 							<td>
 								 <a href="${pageContext.request.contextPath }/admin/book/edit/${book.bid }" title="" class="btn btn-primary"><span class="glyphicon glyphicon-pencil "></span></a>
 	                             <a href="${pageContext.request.contextPath }/admin/book/del/${book.bid }" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này không?')" title="" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>

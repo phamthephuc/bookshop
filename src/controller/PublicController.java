@@ -1,5 +1,7 @@
 package controller;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +29,6 @@ import constant.Defines;
 import model.bean.Author;
 import model.bean.Book;
 import model.bean.Category;
-import model.bean.Contact;
 import model.bean.DetailOrder;
 import model.bean.Order;
 import model.bean.Payment;
@@ -36,14 +37,12 @@ import model.bean.User;
 import model.dao.AuthorDao;
 import model.dao.BookDao;
 import model.dao.CategoryDao;
-import model.dao.ContactDao;
 import model.dao.DetailOrderDao;
 import model.dao.OrderDao;
 import model.dao.PaymentDao;
 import model.dao.PublisherDao;
 import model.dao.SlideDao;
 import model.dao.StatusDao;
-import model.dao.TypeDao;
 import model.dao.UserDao;
 import service.CallApiService;
 import service.ResponseRecommend;
@@ -54,8 +53,6 @@ import util.SlugUtil;
 public class PublicController {
 	@Autowired
 	private BCryptPasswordEncoder password1;
-	@Autowired
-	private ContactDao contactDao;
 	
 	@Autowired
 	private CategoryDao catDao;
@@ -74,9 +71,6 @@ public class PublicController {
 	
 	@Autowired
 	private DetailOrderDao detailOrderDao;
-	
-	@Autowired
-	private TypeDao typeDao;
 	
 	@Autowired
 	private AuthorDao authorDao;
@@ -107,7 +101,6 @@ public class PublicController {
 		modelMap.addAttribute("hashCatParents", hashCatParents);
 		modelMap.addAttribute("listPublishers", publisherDao.getAllPublishers());
 		modelMap.addAttribute("listAuthors", authorDao.getListAuthoresLimit());
-		modelMap.addAttribute("listType",typeDao.getItems() );
 		modelMap.addAttribute("slugUtil", slugUtil);
 	}
 	@RequestMapping("/")
@@ -154,7 +147,7 @@ public class PublicController {
 		modelMap.addAttribute("listBook", proDao.getBookBestSalePagination(group));
 		int numAll = proDao.countItemBestSale();
 		modelMap.addAttribute("numAll", numAll);
-		modelMap.addAttribute("numGroup", numAll / Defines.ROW_COUNT + 1);
+		modelMap.addAttribute("numGroup", (int) Math.ceil(numAll * 1.0 / Defines.ROW_COUNT));
 		modelMap.addAttribute("maxBookInGroup", Defines.ROW_COUNT);
 		return "public.book.bestsale";
 	}
@@ -167,15 +160,19 @@ public class PublicController {
 			modelMap.addAttribute("listCatParent", catDao.getItemsParent());
 			User userLogin = (User) session.getAttribute("objUserLogin");
 			LinkedMultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-			ResponseEntity<ResponseRecommend> responseEntity = CallApiService.getInstance().callGetRecommendServer(params, "/recommendBook" + "/" + userLogin.getId());
-			ResponseRecommend responseRecommend = responseEntity.getBody();
-			if (responseRecommend.data.length > 0) {
-				System.out.println(responseRecommend.toString());
-				List<Book> listBook = proDao.getItemsIn(responseRecommend);
-				System.out.println(listBook.size());
-				modelMap.addAttribute("listBook", listBook);
-			} else {
-				modelMap.addAttribute("listBook", new ArrayList<Book>());
+			try {
+				ResponseEntity<ResponseRecommend> responseEntity = CallApiService.getInstance().callGetRecommendServer(params, "/recommendBook" + "/" + userLogin.getId());
+				ResponseRecommend responseRecommend = responseEntity.getBody();
+				if (responseRecommend.data.length > 0) {
+					System.out.println(responseRecommend.toString());
+					List<Book> listBook = proDao.getItemsIn(responseRecommend);
+					System.out.println(listBook.size());
+					modelMap.addAttribute("listBook", listBook);
+				} else {
+					modelMap.addAttribute("listBook", new ArrayList<Book>());
+				}
+			} catch (Exception e) {
+				modelMap.addAttribute("errMsg", "TÍNH NĂNG NÀY ĐANG BẢO TRÌ");
 			}
 			return "public.book.recommend";
 		} else {
@@ -368,7 +365,11 @@ public class PublicController {
 		user.setPassword(password1.encode(user.getPassword()));
 		if(userDao.addItem(user) > 0)
 		{
-			addUserInRecommendSystem(userDao.getNewestUserId());
+			try {
+				addUserInRecommendSystem(userDao.getNewestUserId());
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 			ra.addFlashAttribute("msg", Defines.SUCCESS);
 		}
 		else
@@ -439,6 +440,25 @@ public class PublicController {
 		return "public.thanhtoan";
 	}
 	
+	@RequestMapping("/loi-so-luong")
+	public String loiSoLuong(ModelMap modelMap,HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		if (session.getAttribute("listDetailOrder") == null) {
+			return "redirect:/";
+		}
+		List<DetailOrder> listDetailOrder = (List<DetailOrder>) session.getAttribute("listDetailOrder");
+		
+		ArrayList<String> listAlert = new ArrayList<>();
+		for (DetailOrder detailOrder : listDetailOrder) { 
+			Book book = proDao.getItem(detailOrder.getId_pro());
+			if (book.getNumber_rest() < detailOrder.getQty()) {
+				listAlert.add("Số lượng sách <strong>" + book.getBook_name() + "</strong> không đủ, bạn muốn mua " + detailOrder.getQty() + " cuốn tuy nhiên chúng tôi chỉ còn " + book.getNumber_rest() + " cuốn");
+			}
+		}
+		modelMap.addAttribute("listAlert", listAlert);
+		return "public.book.errorNumbber";
+	}
+	
 	@RequestMapping("/thong-tin-giao-hang")
 	public String checkOut(ModelMap modelMap, HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -447,13 +467,18 @@ public class PublicController {
 		}
 		List<DetailOrder> listDetailOrder = (List<DetailOrder>) session.getAttribute("listDetailOrder");
 		long sumMoney = 0;
+		ArrayList<String> listAlert = new ArrayList<>();
 		for (DetailOrder detailOrder : listDetailOrder) {
 			Book book = proDao.getItem(detailOrder.getId_pro());
+			if (book.getNumber_rest() < detailOrder.getQty()) {
+				return "redirect:/loi-so-luong";
+			}
 			detailOrder.setName_pro(book.getBook_name());
 			detailOrder.setPrice(book.getPrice());
 			detailOrder.setSale(book.getSale());
 			sumMoney += (book.getPrice() - (long) (book.getPrice() * book.getSale() / 100)) * detailOrder.getQty();
 		}
+		
 		Order order = (Order) session.getAttribute("order");
 		if (order != null) {
 			modelMap.addAttribute("order", order);
@@ -614,6 +639,7 @@ public class PublicController {
 	
 	
 	 public synchronized  int addOrder(Order order) { 
+		 	System.out.println(order.getPhone());
 	       orderDao.addItem(order);
 	       return orderDao.getMaxId();
 	 }
@@ -646,18 +672,35 @@ public class PublicController {
 		CallApiService.getInstance().callPostFromRecommendServer(params, "/buyBook");
 	}
 	@RequestMapping(value="/hinh-thuc-thanh-toan",method=RequestMethod.POST)
-	public String payment(@RequestParam("id_payment") int id_payment, ModelMap modelMap,HttpServletRequest request) {
+	public synchronized String payment(@RequestParam("id_payment") int id_payment, ModelMap modelMap,HttpServletRequest request) {
 		HttpSession session= request.getSession();
 		Order order = (Order) session.getAttribute("order");
 		if (order == null) {
 			return "redirect:/";
 		} else {
+			List<DetailOrder> listDetailOrder = (List<DetailOrder>) session.getAttribute("listDetailOrder");
+			float sumMoney = 0;
+			for (DetailOrder detailOrder : listDetailOrder) {
+				Book book = proDao.getItem(detailOrder.getId_pro());
+				if (book.getNumber_rest() < detailOrder.getQty()) {
+					return "redirect:/loi-so-luong";
+				}
+				sumMoney += (detailOrder.getPrice() - detailOrder.getPrice() * detailOrder.getSale() / 100) * detailOrder.getQty();
+			}
+			if (session.getAttribute("objUserLogin") != null) {
+				User user = (User) session.getAttribute("objUserLogin");
+				order.setId_user(user.getId());
+			}
+			if (sumMoney < Defines.FREE_SHIP_PRICE) {
+				sumMoney += Defines.SHIP_FEE;
+			}
+			order.setAmount(sumMoney);
 			order.setId_payment(id_payment);
 			session.setAttribute("order", order);
 			int idOrder = addOrder(order);
-			List<DetailOrder> listDetailOrder = (List<DetailOrder>) session.getAttribute("listDetailOrder");
 			StringBuilder stringBuilder = new StringBuilder();
 			for (DetailOrder detailOrder : listDetailOrder) {
+				proDao.subNum(detailOrder.getQty(), detailOrder.getId_pro());
 				detailOrder.setId_order(idOrder);
 				detailOrderDao.addItem(detailOrder);
 				stringBuilder.append(detailOrder.getId_pro());
@@ -673,23 +716,6 @@ public class PublicController {
 		
 	}
 	
-	
-	@RequestMapping(value="/lien-he",method=RequestMethod.POST)
-	public String contact(@Valid @ModelAttribute("contact") Contact contact,BindingResult br,RedirectAttributes ra,ModelMap modelMap) {
-		if(br.hasErrors()) {
-			modelMap.addAttribute("contact", contact);
-			return "public.contact";
-		}
-		if(contactDao.addItem(contact) > 0)
-		{
-			ra.addFlashAttribute("msg", Defines.SUCCESS);
-		}
-		else
-		{
-			ra.addFlashAttribute("msg", Defines.ERROR);
-		}
-		return "redirect:/lien-he";
-	}
 
 	@RequestMapping("/thong-tin-gio-hang")
 	public String checkout(ModelMap modelMap,HttpServletRequest request) {
@@ -755,16 +781,16 @@ public class PublicController {
 	}
 
 
-	@RequestMapping(value="/huy-don-hang/{id}",method=RequestMethod.POST)
-	public String huyDonHang(ModelMap modelMap,@PathVariable("id") int id) {
-		orderDao.huyDonHang(id);
-		List<DetailOrder> listDetailOrder = detailOrderDao.getItemsByIdOrder(id);
-		
-		for (DetailOrder detailOrder : listDetailOrder) {
-			proDao.subNum(-detailOrder.getQty(), detailOrder.getId_pro());
-		}
-		return "redirect:/xem-thong-tin";
-			
-	}
+//	@RequestMapping(value="/huy-don-hang/{id}",method=RequestMethod.POST)
+//	public String huyDonHang(ModelMap modelMap,@PathVariable("id") int id) {
+//		orderDao.huyDonHang(id);
+//		List<DetailOrder> listDetailOrder = detailOrderDao.getItemsByIdOrder(id);
+//		
+//		for (DetailOrder detailOrder : listDetailOrder) {
+//			proDao.subNum(-detailOrder.getQty(), detailOrder.getId_pro());
+//		}
+//		return "redirect:/xem-thong-tin";
+//			
+//	}
 	
 }

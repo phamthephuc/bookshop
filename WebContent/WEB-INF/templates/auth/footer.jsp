@@ -1,11 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 	
-			<!-- footer -->
-			<div class="copyright">
-				<p>Â© 2016 Colored . All Rights Reserved . Design by <a href="http://w3layouts.com/">W3layouts</a></p>
-			</div>
-			<!-- //footer -->
 			
 		</div>
 	<script src="${pageContext.request.contextPath }/templates/admin/js/proton.js"></script>

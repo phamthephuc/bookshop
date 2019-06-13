@@ -51,6 +51,16 @@ public class AuthorDao {
 		return null;
 	}
 	
+	public Author getAuthorByName(String name) {
+		try {
+			String sql = "SELECT * FROM author WHERE name = ?";
+			return jdbcTemplate.queryForObject(sql, new Object[] {name},new BeanPropertyRowMapper<Author>(Author.class));
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+	
 
 	public int editItem(Author author) {
 		String sql = "UPDATE author SET name = ? WHERE aid = ?";

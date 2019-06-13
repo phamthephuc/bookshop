@@ -55,14 +55,16 @@ if(${msg eq 1}) alert("Cập nhập thành công");
 								<td><fmt:formatDate pattern="dd/MM/yyyy hh:mm:ss"
 										value="${objOrder.date_create_order }" var="date" />${date }</td>
 								<td>${objOrder.fullname }</td>
-								<td>${objOrder.name_status }</td>
+								<td><span id="statusOrder${objOrder.id_order}">${objOrder.name_status }</span></td>
 								<td align="center"><a
 									href="${pageContext.request.contextPath}/chi-tiet-don-hang/${objOrder.id_order }"><b>Xem
 											đơn hàng</b></a>
 									<br>
-									<c:if test="${objOrder.id_status == 0 }">
-										<a style="color: red;" href="${pageContext.request.contextPath}/huy-don-hang/${objOrder.id_order }"><b>Hủy đơn hàng</b></a>
-									</c:if>
+									<div id="cancelOrder${objOrder.id_order}">
+										<c:if test="${objOrder.id_status == 0 }">
+											<a style="color: red;" href="javascript:" onclick="return huyDonHang(${objOrder.id_order });"><b>Hủy đơn hàng</b></a>
+										</c:if>
+									</div>
 								</td>
 								
 							</tr>

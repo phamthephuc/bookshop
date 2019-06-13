@@ -19,7 +19,7 @@ public class Order {
 	private String email;
 	
 	@NotBlank
-	@Size(min=10,max=12)
+	@Size(min=10,max=11)
 	private String phone;
 	
 	@NotBlank

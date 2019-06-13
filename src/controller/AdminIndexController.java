@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import constant.Defines;
 import model.bean.Order;
-import model.dao.ContactDao;
 import model.dao.OrderDao;
 import model.dao.BookDao;
 import model.dao.UserDao;
@@ -33,9 +32,6 @@ public class AdminIndexController {
 	@Autowired
 	private Defines defines;
 	
-	@Autowired
-	private ContactDao contactDao;
-	
 	@ModelAttribute
 	public void commonObjects(ModelMap modelMap) {
 		modelMap.addAttribute("Defines", defines);
@@ -48,7 +44,7 @@ public class AdminIndexController {
 	public String index(HttpSession session,Principal principal,ModelMap modelMap) {
 		modelMap.addAttribute("numUser", userDao.countItem());
 		modelMap.addAttribute("numPro", proDao.countItemsRunningOut());
-		modelMap.addAttribute("numContact", contactDao.countItem());
+		modelMap.addAttribute("numContact", 0);
 		modelMap.addAttribute("numOrderChuaXuLy", orderDao.countItemChuaXuLy());
 		session.setAttribute("userInfo", userDao.getItem(principal.getName()));
 		return "admin.index";

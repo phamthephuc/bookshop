@@ -41,9 +41,15 @@
 				<div
 					style="position: relative; padding: 0 20px; overflow: hidden; height: 340px;">
 					<div id="ajaxncontainer">
-						<c:forEach items="${listBookNewest }" begin="0" end="4"
+					<% int index = 0;
+						String id = "";
+					%>
+						<c:forEach items="${listBookNewest }"
 							var="objBook">
-							<div class="product_contener">
+							<% index = index + 1; 
+								id = "new" + index;
+							%>
+							<div class="product_contener" id=<%=id %>>
 								<div class="products">
 									<div class="image">
 										<a
@@ -85,8 +91,9 @@
 			<div class="clear"></div>
 			<script>
 				var pagen = 1;
-				var countn = 4;
-				$("#prevn").addClass("disable");
+				var numn = $("#ajaxncontainer").children(".product_contener").length;
+				var countn = Math.ceil(numn / 5.0);
+				$("#prevn").addClass("hidein");
 				if (countn <= 1)
 					$("#nextn").addClass("ndisable");
 				function showproduct(step) {
@@ -100,18 +107,37 @@
 					}
 
 					if (pagen == 1) {
-						$("#prevn").addClass("disable");
+						$("#prevn").addClass("hidein");
 					} else {
-						$("#prevn").removeClass("disable");
+						$("#prevn").removeClass("hidein");
 					}
 
 					if (pagen == countn || pagen > countn) {
-						$("#nextn").addClass("ndisable");
+						$("#nextn").addClass("hidein");
 					} else {
-						$("#nextn").removeClass("ndisable");
+						$("#nextn").removeClass("hidein");
+					}
+					
+					if(step == 1) {
+						var tmp = pagen - 1;
+						var max = (tmp * 5 > numn) ? numn : (tmp * 5);
+						for (var i = (tmp - 1) * 5 + 1; i <= max; i++) {
+							var id = "#new" + i;
+							$(id).addClass('hidein');
+							/* $(id).delay(100 * i).fadeIn(100); */
+							
+						}
+					} else {
+						var max = (pagen * 5 > numn) ? numn : (pagen * 5);
+						for (var i = (pagen - 1) * 5 + 1; i <= max; i++) {
+							var id = "#new" + i;
+							$(id).removeClass('hidein');
+							/* $(id).delay(100 * i).fadeIn(100); */
+							
+						}
 					}
 
-					address = '${pageContext.request.contextPath}/show-slide-newest';
+					/* address = '${pageContext.request.contextPath}/show-slide-newest';
 					address = addQuery(address, 'page=' + pagen);
 					$.ajax({
 						url : address,
@@ -142,12 +168,12 @@
 							}
 							return true;
 						}
-					});
+					}); */
 				}
 			</script>
 		</div>
 
-		<div class="block" id="module_publishing">
+		<%-- <div class="block" id="module_publishing">
 			<h2>
 				<a class="title" href="${pageContext.request.contextPath}/sach-sap-phat-hanh"
 					title="Sắp phát hành">Sắp phát hành<span
@@ -155,12 +181,17 @@
 					href="${pageContext.request.contextPath}/sach-sap-phat-hanh" title="Xem tất cả">Xem tất cả</a>
 			</h2>
 			<div class="blockcontent">
+				<% index = 0; %>
 				<div
 					style="position: relative; padding: 0 20px; overflow: hidden; height: 340px">
 					<div id="ajaxcontainer">
-						<c:forEach items="${listBookComingSoon }" begin="0" end="4"
+						<c:forEach items="${listBookComingSoon }"
 							var="objBook">
-							<div class="product_contener">
+							<%
+								index++;
+								id = "publisher" + index;
+							%>
+							<div class="product_contener" id=<%=id %>>
 								<div class="products">
 									<div class="image">
 										<a
@@ -203,12 +234,14 @@
 		<div class="clear"></div>
 		<script>
 			var page = 1;
-			var count = 1;
-			$("#pprev").addClass("disable");
+			var num = $("#ajaxcontainer").children(".product_contener").length;
+			var count = Math.ceil(num / 5.0);
+			$("#pprev").addClass("hidein");
 			if (count <= 1)
-				$("#pnext").addClass("ndisable");
+				$("#pnext").addClass("hidein");
 			function publishing(step) {
-				if ((page == 1 && step == -1) || (page == count && step == 1))
+				if ((page == 1 && step == -1)
+						|| (page == count && step == 1))
 					return;
 
 				page = page + step;
@@ -217,51 +250,40 @@
 				}
 
 				if (page == 1) {
-					$("#pprev").addClass("disable");
+					$("#pprev").addClass("hidein");
 				} else {
-					$("#pprev").removeClass("disable");
+					$("#pprev").removeClass("hidein");
 				}
 
 				if (page == count || page > count) {
-					$("#pnext").addClass("ndisable");
+					$("#pnext").addClass("hidein");
 				} else {
-					$("#pnext").removeClass("ndisable");
+					$("#pnext").removeClass("hidein");
+				}
+				
+				if(step == 1) {
+					var tmp = page - 1;
+					var max = (tmp * 5 > num) ? num : (tmp * 5);
+					for (var i = (tmp - 1) * 5 + 1; i <= max; i++) {
+						var id = "#publisher" + i;
+						$(id).addClass('hidein');
+						/* $(id).delay(100 * i).fadeIn(100); */
+						
+					}
+				} else {
+					var max = (page * 5 > num) ? num : (page * 5);
+					for (var i = (page - 1) * 5 + 1; i <= max; i++) {
+						var id = "#publisher" + i;
+						$(id).removeClass('hidein');
+						/* $(id).delay(100 * i).fadeIn(100); */
+						
+					}
 				}
 
-				address = '${pageContext.request.contextPath}/show-slide-coming-soon';
-				address = addQuery(address, 'page=' + page);
-				$.ajax({
-					url : address,
-					dataType : "html",
-					type : "GET",
-					cache : false,
-					error : function(e) {
-						Boxy.alert('Lỗi ajax', null, {
-							title : 'Lỗi'
-						});
-						return false;
-					},
-					success : function(data) {
-						$("#ajaxcontainer").empty();
-						$("#ajaxcontainer").append(data);
-						i = 0;
-						if (step == 1) {
-							$(".hide").each(function(index) {
-								$(this).delay(50 * i).fadeIn(100);
-								i++;
-							});
-						} else {
-							$($(".hide").get().reverse()).each(function(index) {
-								$(this).delay(50 * i).fadeIn(100);
-								i++;
-							});
-						}
-						return true;
-					}
-				});
+				
 			}
 		</script>
-	</div>
+	</div> --%>
 	<div class="block" id="module_bestseller">
 		<h2>
 			<a class="title" href="${pageContext.request.contextPath}/sach-ban-chay" title="Sách bán chạy">Sách
@@ -272,14 +294,19 @@
 		<div class="blockcontent">
 			<div
 				style="position: relative; padding: 0 20px; overflow: hidden; height: 340px">
+				<% index = 0; %>
 				<div id="bajaxcontainer">
-					<c:forEach items="${listBookBestSale }" begin="0" end="4"
+					<c:forEach items="${listBookBestSale }"
 							var="objBook">
-							<div class="product_contener">
+							<%
+								index++;
+								id = "bestsale" + index;
+							%>
+							<div class="product_contener" id=<%=id %>>
 								<div class="products">
 									<div class="image">
 										<a
-											href="${pageContext.request.contextPath}/sach-truyen/${slugUtil.makeSlug(objBook.book_name)}-${objBook.bid}.html"
+											href="${pageContext.request.contextPath}/sach-truyen/${objBook.bid}/${slugUtil.makeSlug(objBook.book_name)}.html"
 											title="${objBook.book_name }"><img
 											src="${pageContext.request.contextPath}/files/${objBook.picture}"
 											alt="${objBook.book_name }" title="${objBook.book_name }" /></a>
@@ -318,10 +345,11 @@
 		<div class="clear"></div>
 		<script>
 			var pageb = 1;
-			var countb = 4;
-			$("#bprev").addClass("disable");
+			var numb = $("#bajaxcontainer").children(".product_contener").length;
+			var countb = Math.ceil(numb / 5.0);
+			$("#bprev").addClass("hidein");
 			if (countb <= 1)
-				$("#bnext").addClass("ndisable");
+				$("#bnext").addClass("hidein");
 			function bestproduct(step) {
 				if ((pageb == 1 && step == -1)
 						|| (pageb == countb && step == 1))
@@ -333,57 +361,42 @@
 				}
 
 				if (pageb == 1) {
-					$("#bprev").addClass("disable");
+					$("#bprev").addClass("hidein");
 				} else {
-					$("#bprev").removeClass("disable");
+					$("#bprev").removeClass("hidein");
 				}
 
 				if (pageb == countb || pageb > countb) {
-					$("#bnext").addClass("ndisable");
+					$("#bnext").addClass("hidein");
 				} else {
-					$("#bnext").removeClass("ndisable");
+					$("#bnext").removeClass("hidein");
+				}
+				if(step == 1) {
+					var tmp = pageb - 1;
+					var max = (tmp * 5 > numb) ? numb : (tmp * 5);
+					for (var i = (tmp - 1) * 5 + 1; i <= max; i++) {
+						var id = "#bestsale" + i;
+						$(id).addClass('hidein');
+						/* $(id).delay(100 * i).fadeIn(100); */
+						
+					}
+				} else {
+					var max = (pageb * 5 > num) ? num : (pageb * 5);
+					for (var i = (pageb - 1) * 5 + 1; i <= max; i++) {
+						var id = "#bestsale" + i;
+						$(id).removeClass('hidein');
+						/* $(id).delay(100 * i).fadeIn(100); */
+						
+					}
 				}
 
-				address = '${pageContext.request.contextPath}/show-slide-bestsale';
-				address = addQuery(address, 'page=' + pageb);
-				$.ajax({
-					url : address,
-					dataType : "html",
-					type : "GET",
-					cache : false,
-					error : function(e) {
-						Boxy.alert('Lỗi ajax', null, {
-							title : 'Lỗi'
-						});
-						return false;
-					},
-					success : function(data) {
-						$("#bajaxcontainer").empty();
-						$("#bajaxcontainer").append(data);
-						i = 0;
-						if (step == 1) {
-							$(".hide").each(function(index) {
-								$(this).delay(100 * i).fadeIn(100);
-								i++;
-							});
-						} else {
-							$($(".hide").get().reverse()).each(function(index) {
-								$(this).delay(100 * i).fadeIn(100);
-								i++;
-							});
-						}
-						return true;
-					}
-				});
 			}
 		</script>
 	</div>
 	<div class="block" id="module_topcategories">
 		<h2>
-			<a class="title" href="${pageContext.request.contextPath}/"
+			<a class="title" href="javascript:void(0)"
 				title="Danh mục">Danh mục<span class="b-main__category-arrow"></span></a>
-			<a class="more" href="${pageContext.request.contextPath}/"
-				title="Xem tất cả">Xem tất cả</a>
 		</h2>
 		<div class="blockcontent">
 			<div
@@ -430,7 +443,7 @@
 			<p>
 				<span style="font-family: arial, helvetica, sans-serif;"><span
 					style="font-size: 12px;">Khi mua s&aacute;ch online tại
-						Nobita.vn, Qu&yacute; kh&aacute;ch được <strong>Bọc
+						GreenBook.vn, Qu&yacute; kh&aacute;ch được <strong>Bọc
 							plastic miễn ph&iacute; đến 99%</strong> (trừ s&aacute;ch b&igrave;a cứng,
 						s&aacute;ch dạng hộp - dạng đặc biệt, s&aacute;ch khổ qu&aacute;
 						to, ...)

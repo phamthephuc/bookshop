@@ -55,14 +55,14 @@
 													<c:forEach items="${listOrder }" var="order">
 														<tr>
 															<td>${order.id_order }</td>
-															<td>${order.amount }$</td>
+															<td><fmt:formatNumber type="number" value='${slugUtil.formatPrice(order.amount) }'/>đ</td>
 															<td> <a href="${pageContext.request.contextPath }/admin/order/view/${order.id_order }" title="" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open "></span> Xem</a></td>
 														</tr>
 													</c:forEach>
 												</tbody>
 											</table>
 											<br>
-											<div style="color:green;float: right" >Tổng tiền : ${tongTien }$</div><br>
+											<div style="color:green;float: right" >Tổng tiền : <fmt:formatNumber type="number" value='${slugUtil.formatPrice(tongTien) }'/> đ</div><br>
 										</div>
 									</div>
 								</div>

@@ -32,6 +32,7 @@ import model.dao.OrderDao;
 import model.dao.PublisherDao;
 import service.CallApiService;
 import util.FileUtil;
+import util.SlugUtil;
 
 @Controller
 @RequestMapping("/admin")
@@ -55,12 +56,16 @@ public class AdminBookController {
 	@Autowired
 	private Defines defines;
 
+	@Autowired
+	private SlugUtil slugUtil;
+	
 	@ModelAttribute
 	public void commonObjects(ModelMap modelMap) {
 		modelMap.addAttribute("Defines", defines);
 		List<Order> listOrder = orderDao.getItemsChuaXuLy();
 		modelMap.addAttribute("numNewOrder", orderDao.countItemChuaXuLy());
 		modelMap.addAttribute("listOrderChuaXuLy", listOrder);
+		modelMap.addAttribute("slugUtil", slugUtil);
 	}
 	
 	@RequestMapping(value = { "/books/{page}", "/books" }, method = RequestMethod.GET)
@@ -76,12 +81,24 @@ public class AdminBookController {
 		modelMap.addAttribute("page", page);
 		return "admin.book.index";
 	}
-
-	@RequestMapping(value = { "/search" }, method = RequestMethod.POST)
-	public String indexSerach(ModelMap modelMap, @ModelAttribute(value = "key") String key) {
-		modelMap.addAttribute("listProduct", proDao.getItemsByName(key));
+	
+	@RequestMapping(value = { "/books" }, method = RequestMethod.POST)
+	public String search(ModelMap modelMap, @PathVariable(value = "page", required = false) Integer page,@ModelAttribute(value = "key") String key) {
+		modelMap.addAttribute("listBooks", proDao.getBookSearchName(key));
 		return "admin.book.search";
 	}
+	
+	@RequestMapping(value = { "/book/running-out" }, method = RequestMethod.GET)
+	public String runningOut(ModelMap modelMap, @PathVariable(value = "page", required = false) Integer page,@ModelAttribute(value = "key") String key) {
+		modelMap.addAttribute("listBooks", proDao.getItemsRunningOut());
+		return "admin.book.search";
+	}
+
+//	@RequestMapping(value = { "/search" }, method = RequestMethod.POST)
+//	public String indexSerach(ModelMap modelMap, @ModelAttribute(value = "key") String key) {
+//		modelMap.addAttribute("listBooks", proDao.getItemsByName(key));
+//		return "admin.book.search";
+//	}
 
 	@RequestMapping(value = { "books/running-out" }, method = RequestMethod.GET)
 	public String runningoutPro(ModelMap modelMap, @ModelAttribute(value = "key") String key) {
@@ -119,6 +136,12 @@ public class AdminBookController {
         CallApiService.getInstance().callPostFromRecommendServer(params, "deleteBook");
 	}
 	
+	private void activeBookInRecommendSystem(Integer bid) {
+		LinkedMultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("id_book", bid);
+        CallApiService.getInstance().callPostFromRecommendServer(params, "activeBook");
+	}
+	
 	@RequestMapping(value = "/book/add", method = RequestMethod.POST)
 	public String add(@ModelAttribute("book") Book book, BindingResult bindingResult,
 			@RequestParam("hinh") CommonsMultipartFile multipartFile1, HttpServletRequest request,
@@ -139,7 +162,11 @@ public class AdminBookController {
 			redirectAttributes.addFlashAttribute("msg", Defines.ERROR);
 		}
 		int bookId = proDao.getNewestIdBook();
-		addBookInRecommendSystem(bookId);
+		try {
+			addBookInRecommendSystem(bookId);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 		return "redirect:/admin/books";
 	}
 
@@ -154,7 +181,11 @@ public class AdminBookController {
 			e.printStackTrace();
 		}
 		if (proDao.delItem(id) > 0) {
-			deleteBookInRecommendSystem(id);
+			try {
+				deleteBookInRecommendSystem(id);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 			attributes.addFlashAttribute("msg", Defines.SUCCESS);
 		} else {
 			attributes.addFlashAttribute("msg", Defines.ERROR);
@@ -181,9 +212,9 @@ public class AdminBookController {
 
 	@RequestMapping(value = "book/addNum/{id}", method = RequestMethod.GET)
 	public String addNum(@PathVariable("id") int id, ModelMap modelMap) {
-		Book pro = proDao.getItem(id);
-		if (pro != null) {
-			modelMap.addAttribute("pro", pro);
+		Book book = proDao.getItem(id);
+		if (book != null) {
+			modelMap.addAttribute("book", book);
 		}
 		return "admin.book.addNum";
 	}
@@ -198,6 +229,8 @@ public class AdminBookController {
 	public String edit(@ModelAttribute("book") Book pro, BindingResult bindingResult, @RequestParam("hinh") CommonsMultipartFile multipartFile1,
 			HttpServletRequest request, @PathVariable("id") int id, RedirectAttributes redirectAttributes) {
 		Book oldProduct = proDao.getItem(id);
+		System.out.println("oldPro : " + pro.isIs_active());
+		System.out.println("newPro : " + oldProduct.isIs_active());
 
 		String fileName1 = oldProduct.getPicture();
 		try {
@@ -210,6 +243,19 @@ public class AdminBookController {
 		pro.setPicture(fileName1);
 		pro.setBid(id);
 		if (proDao.editItem(pro) > 0) {
+			if (pro.isIs_active() == false && oldProduct.isIs_active() == true) {
+				try {
+					deleteBookInRecommendSystem(id);
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			} else if (pro.isIs_active() == true && oldProduct.isIs_active() == false) {
+				try {
+					activeBookInRecommendSystem(id);
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			}
 			redirectAttributes.addFlashAttribute("msg", Defines.SUCCESS);
 		} else {
 			redirectAttributes.addFlashAttribute("msg", Defines.ERROR);

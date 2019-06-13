@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,11 +15,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import constant.Defines;
 import model.bean.DetailOrder;
 import model.bean.Order;
-import model.dao.ContactDao;
 import model.dao.DetailOrderDao;
 import model.dao.OrderDao;
 import model.dao.BookDao;
 import model.dao.StatusDao;
+import service.CallApiService;
+import util.SlugUtil;
 
 @Controller
 @RequestMapping("/admin")
@@ -32,8 +34,6 @@ public class AdminOrderController {
 	@Autowired
 	private DetailOrderDao detailOrderDao;
 	
-	@Autowired
-	private ContactDao contactDao;
 	
 	@Autowired
 	private BookDao proDao;
@@ -41,12 +41,16 @@ public class AdminOrderController {
 	@Autowired
 	private Defines defines;
 	
+	@Autowired
+	private SlugUtil slugUtil;
+	
 	@ModelAttribute
 	public void commonObjects(ModelMap modelMap) {
 		modelMap.addAttribute("Defines", defines);
 		modelMap.addAttribute("numNewOrder",orderDao.countItemChuaXuLy());
 		List<Order> listOrder = orderDao.getItemsChuaXuLy();
 		modelMap.addAttribute("listOrderChuaXuLy", listOrder);
+		modelMap.addAttribute("slugUtil", slugUtil);
 	}
 	
 	
@@ -103,6 +107,8 @@ public class AdminOrderController {
 		modelMap.addAttribute("listStatus", statusDao.getItems());
 		List<DetailOrder> listDetailOrder = detailOrderDao.getItemsByIdOrder(id);
 		modelMap.addAttribute("listDetailOrder", listDetailOrder);
+		modelMap.addAttribute("shipFee", Defines.SHIP_FEE);
+		modelMap.addAttribute("freeShipPrice", Defines.FREE_SHIP_PRICE);
 		return "admin.order.edit";
 	}
 	
@@ -111,11 +117,16 @@ public class AdminOrderController {
 	public String edit(@ModelAttribute("order") Order order,RedirectAttributes ra,ModelMap modelMap,@PathVariable("id") int id) {
 		order.setId_order(id);
 		
-		if(order.getId_status() == 2) {
+		Order oldOrder = orderDao.getItem(id);
+		if(oldOrder.getId_status() != 2 && order.getId_status() == 2) {
 			List<DetailOrder> listDetailOrder = detailOrderDao.getItemsByIdOrder(id);
+			StringBuilder stringBuilder = new StringBuilder();
 			for (DetailOrder detailOrder : listDetailOrder) {
 				proDao.subNum(-detailOrder.getQty(), detailOrder.getId_pro());
+				stringBuilder.append(detailOrder.getId_pro());
+				stringBuilder.append(" ");
 			}
+			removeOrderToApi(stringBuilder.toString(), oldOrder.getId_user(), id);
 		}
 		
 		if(orderDao.editItem(order)>0) {
@@ -128,4 +139,11 @@ public class AdminOrderController {
 			
 	}
 
+	private void removeOrderToApi(String stringArray, int idUser, int idOrder) {
+		LinkedMultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+		params.add("list_id_book", stringArray);
+		params.add("id_user", idUser);
+		params.add("id_order", idOrder);
+		CallApiService.getInstance().callPostFromRecommendServer(params, "/cancelBuyBook");
+	}
 }

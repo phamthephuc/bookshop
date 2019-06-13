@@ -95,7 +95,11 @@ public class AdminUserController {
 		}else {
 			if(userDao.delItem(id)>0) {
 				if (user.getRole_id() == 3) {
-					deleteUserInRecommendSystem(id);
+					try {
+						deleteUserInRecommendSystem(id);
+					} catch (Exception e) {
+						// TODO: handle exception
+					}
 				}
 				attributes.addFlashAttribute("msg", Defines.SUCCESS);
 			}else {

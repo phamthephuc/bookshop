@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,8 +18,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import model.bean.Book;
 import model.bean.DetailOrder;
+import model.bean.Order;
+import model.bean.User;
 import model.dao.BookDao;
+import model.dao.DetailOrderDao;
 import model.dao.OrderDao;
+import service.CallApiService;
 import util.SlugUtil;
 
 @Controller
@@ -26,6 +31,10 @@ import util.SlugUtil;
 public class PublicProductController {
 	@Autowired
 	private BookDao bookDao;
+	
+	@Autowired
+	private DetailOrderDao detailOrderDao;
+
 	
 	@Autowired
 	private OrderDao orderDao;
@@ -61,6 +70,34 @@ public class PublicProductController {
 			}
 		}
 		
+		boolean haveErorrNumber = false;
+		StringBuilder stringBuilder2 = new StringBuilder();
+		int sumMoney = 0;
+		for (DetailOrder detailOrder : listDetailOrder) {
+			Book bookInCart = bookDao.getItem(detailOrder.getId_pro());
+			if (bookInCart.getNumber_rest() < detailOrder.getQty()) {
+				haveErorrNumber = true;
+			}
+			int bookId = bookInCart.getBid();
+			stringBuilder2.append("<tr id='proAdd" + bookId + "'><td nowrap='nowrap'>");
+			stringBuilder2.append("<img src='" + request.getContextPath() + "/files/" + bookInCart.getPicture() + "' width='40' height='50' alt='" + bookInCart.getBook_name() + "'> ");
+			stringBuilder2.append("</td>");
+			stringBuilder2.append("<td><div class='productname'> ");
+			stringBuilder2.append("<a href='" + request.getContextPath() + "/sach-truyen/" + bookId +"/"+ SlugUtil.makeSlug(bookInCart.getBook_name()) + ".html' title='" + bookInCart.getBook_name() + "'>" + bookInCart.getBook_name() + "</a></div></td>");
+			stringBuilder2.append("<td align='right' width='20%'><div class='sprice' style='text-decoration: line-through;' id='price2910'> ");
+			stringBuilder2.append((int)bookInCart.getPrice());
+			stringBuilder2.append("₫</div></td>");
+			stringBuilder2.append("<td align='right' width='20%'><div class='sprice' id='price" + bookId + "'> ");
+			int realPrice = (int)(bookInCart.getPrice() - bookInCart.getSale() * bookInCart.getPrice() / 100);
+			stringBuilder2.append(realPrice);
+			stringBuilder2.append("₫</div></td>");
+			stringBuilder2.append("<td class='quantity' align='right' width='20%'><input name='quantity2910' onkeydown='validateUserInput();' type='number' size='3' maxlength='3' class='small' value='" + detailOrder.getQty() + "' onkeyup='changeQty( " + bookInCart.getBid() + " , this.value);' onchange='changeQty(" + bookInCart.getBid() + " , this.value);' autocomplete='off'><div style='padding-right:15px'><a href='javascript:' onclick='changeQty(" + bookId  + ", 0);'>Xóa</a></div></td><td align='right' width='20%'><span id='cart-intoMoney" + bookId + "'>");
+			stringBuilder2.append(realPrice * detailOrder.getQty());
+			stringBuilder2.append(" ₫</span></td></tr>");
+			sumMoney += realPrice * detailOrder.getQty();
+		}
+		
+		
 		session.setAttribute("listDetailOrder", listDetailOrder);
 		session.setAttribute("numProduct", listDetailOrder.size());
 		StringBuilder stringBuilder = new StringBuilder();
@@ -68,30 +105,19 @@ public class PublicProductController {
 		stringBuilder.append(pro.getBook_name());
 		stringBuilder.append("</div><div class='cartintro'>Bạn có <span id='cartnumber'>");
 		stringBuilder.append(listDetailOrder.size());
-		stringBuilder.append("</span> sản phẩm trong giỏ</div><table cellpadding='0' cellspacing='0' width='100%'><tbody><tr><td colspan='2'><table cellpadding='2' cellspacing='0' width='100%' id='thtitle'><tbody>");
+		stringBuilder.append("</span> sản phẩm trong giỏ</div>");
+		if (haveErorrNumber) {
+			stringBuilder.append("<div id='errorNumber' class='cartintro' style='background-color: #FDEDEC; color: #C0392B; font-weight: bold'>Số lượng sách trong giỏ hàng không hợp lệ</div>");
+		} else {
+			stringBuilder.append("<div id='errorNumber' class='cartintro hidein' style='background-color: #FDEDEC; color: #C0392B; font-weight: bold'>Số lượng sách trong giỏ hàng không hợp lệ</div>");
+		}
+		stringBuilder.append("<table cellpadding='0' cellspacing='0' width='100%'><tbody><tr><td colspan='2'><table cellpadding='2' cellspacing='0' width='100%' id='thtitle'><tbody>");
 		stringBuilder.append("<tr><th width='20%' colspan='2' align='left'>Sản phẩm trong giỏ</th><th width='20%' align='right'>Giá gốc</th><th width='20%' align='right'>Giá giảm</th><th width='20%' align='right'>Số lượng</th><th width='20%' align='right'>Thành tiền</th></tr>");
 		stringBuilder.append("</tbody></table><div class='showboxcart' id='contentcart'><table cellpadding='2' cellspacing='0' width='100%' class='productscart'><tbody>");
-		int sumMoney = 0;
-		for (DetailOrder detailOrder : listDetailOrder) {
-			Book bookInCart = bookDao.getItem(detailOrder.getId_pro());
-			int bookId = bookInCart.getBid();
-			stringBuilder.append("<tr id='proAdd" + bookId + "'><td nowrap='nowrap'>");
-			stringBuilder.append("<img src='" + request.getContextPath() + "/files/" + bookInCart.getPicture() + "' width='40' height='50' alt='" + bookInCart.getBook_name() + "'> ");
-			stringBuilder.append("</td>");
-			stringBuilder.append("<td><div class='productname'> ");
-			stringBuilder.append("<a href='" + request.getContextPath() + "/sach-truyen/" + bookId +"/"+ SlugUtil.makeSlug(bookInCart.getBook_name()) + ".html' title='" + bookInCart.getBook_name() + "'>" + bookInCart.getBook_name() + "</a></div></td>");
-			stringBuilder.append("<td align='right' width='20%'><div class='sprice' style='text-decoration: line-through;' id='price2910'> ");
-			stringBuilder.append((int)bookInCart.getPrice());
-			stringBuilder.append("₫</div></td>");
-			stringBuilder.append("<td align='right' width='20%'><div class='sprice' id='price" + bookId + "'> ");
-			int realPrice = (int)(bookInCart.getPrice() - bookInCart.getSale() * bookInCart.getPrice() / 100);
-			stringBuilder.append(realPrice);
-			stringBuilder.append("₫</div></td>");
-			stringBuilder.append("<td class='quantity' align='right' width='20%'><input name='quantity2910' onkeydown='validateUserInput();' type='number' size='3' maxlength='3' class='small' value='" + detailOrder.getQty() + "' onkeyup='changeQty( " + bookInCart.getBid() + " , this.value);' onchange='changeQty(" + bookInCart.getBid() + " , this.value);' autocomplete='off'><div style='padding-right:15px'><a href='javascript:' onclick='changeQty(" + bookId  + ", 0);'>Xóa</a></div></td><td align='right' width='20%'><span id='cart-intoMoney" + bookId + "'>");
-			stringBuilder.append(realPrice * detailOrder.getQty());
-			stringBuilder.append(" ₫</span></td></tr>");
-			sumMoney += realPrice * detailOrder.getQty();
-		}
+		
+		
+		
+		stringBuilder.append(stringBuilder2.toString());
 		stringBuilder.append("</tbody></table></div>");
 		stringBuilder.append("<table cellpadding='2' cellspacing='1' width='100%'><tbody>");
 		stringBuilder.append("<tr id='couponvalue' style='display:none'><td class='cardtool'><b>Ưu đãi</b></td><td class='cart-subtotal cardtool'><span id='cart-coupon'>0 ₫</span></td></tr><tr><td class='cardtool'><b>Thành tiền:</b></td><td class='cart-subtotal cardtool'><span id='cart-total'><b> ");
@@ -112,36 +138,55 @@ public class PublicProductController {
 		else
 		{
 			listDetailOrder = (List<DetailOrder>) session.getAttribute("listDetailOrder");
+			
+			int sumMoney = 0;
+			boolean haveErrorNumber = false;
+			StringBuilder stringBuilder2 = new StringBuilder();
+			for (DetailOrder detailOrder : listDetailOrder) {
+				Book bookInCart = bookDao.getItem(detailOrder.getId_pro());
+				if (bookInCart.getNumber_rest() < detailOrder.getQty()) {
+					haveErrorNumber = true;
+				}
+				int bookId = bookInCart.getBid();
+				stringBuilder2.append("<tr id='proAdd" + bookId + "'><td nowrap='nowrap'>");
+				stringBuilder2.append("<img src='" + request.getContextPath() + "/files/" + bookInCart.getPicture() + "' width='40' height='50' alt='" + bookInCart.getBook_name() + "'> ");
+				stringBuilder2.append("</td>");
+				stringBuilder2.append("<td><div class='productname'> ");
+				stringBuilder2.append("<a href='" + request.getContextPath() + "/sach-truyen/" + bookId +"/"+ SlugUtil.makeSlug(bookInCart.getBook_name()) + ".html' title='" + bookInCart.getBook_name() + "'>" + bookInCart.getBook_name() + "</a></div></td>");
+				stringBuilder2.append("<td align='right' width='20%'><div class='sprice' style='text-decoration: line-through;' id='price2910'> ");
+				stringBuilder2.append((int)bookInCart.getPrice());
+				stringBuilder2.append("₫</div></td>");
+				stringBuilder2.append("<td align='right' width='20%'><div class='sprice' id='price" + bookId + "'> ");
+				int realPrice = (int)(bookInCart.getPrice() - bookInCart.getSale() * bookInCart.getPrice() / 100);
+				stringBuilder2.append(realPrice);
+				stringBuilder2.append("₫</div></td>");
+				stringBuilder2.append("<td class='quantity' align='right' width='20%'><input name='quantity2910' onkeydown='validateUserInput();' type='number' size='3' maxlength='3' class='small' value='" + detailOrder.getQty() + "' onkeyup='changeQty( " + bookInCart.getBid() + " , this.value);' onchange='changeQty(" + bookInCart.getBid() + " , this.value);' autocomplete='off'><div style='padding-right:15px'><a href='javascript:' onclick='changeQty(" + bookId  + ", 0);'>Xóa</a></div></td><td align='right' width='20%'><span id='cart-intoMoney" + bookId + "'>");
+				stringBuilder2.append(realPrice * detailOrder.getQty());
+				stringBuilder2.append(" ₫</span></td></tr>");
+				sumMoney += realPrice * detailOrder.getQty();
+			}
+			
 			session.setAttribute("listDetailOrder", listDetailOrder);
 			session.setAttribute("numProduct", listDetailOrder.size());
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.append("<div id='showempty'></div><div class='blockcontent' id='showcart'>");
 			stringBuilder.append("<div class='cartintro'>Bạn có <span id='cartnumber'>");
 			stringBuilder.append(listDetailOrder.size());
-			stringBuilder.append("</span> sản phẩm trong giỏ</div><table cellpadding='0' cellspacing='0' width='100%'><tbody><tr><td colspan='2'><table cellpadding='2' cellspacing='0' width='100%' id='thtitle'><tbody>");
+			stringBuilder.append("</span> sản phẩm trong giỏ</div>");
+			if (haveErrorNumber) {
+				stringBuilder.append("<div id='errorNumber' class='cartintro' style='background-color: #FDEDEC; color: #C0392B; font-weight: bold'>Số lượng sách trong giỏ hàng không hợp lệ</div>");
+			} else {
+				stringBuilder.append("<div id='errorNumber' class='cartintro hidein' style='background-color: #FDEDEC; color: #C0392B; font-weight: bold'>Số lượng sách trong giỏ hàng không hợp lệ</div>");
+			}
+			
+			
+			stringBuilder.append("<table cellpadding='0' cellspacing='0' width='100%'><tbody><tr><td colspan='2'><table cellpadding='2' cellspacing='0' width='100%' id='thtitle'><tbody>");
 			stringBuilder.append("<tr><th width='20%' colspan='2' align='left'>Sản phẩm trong giỏ</th><th width='20%' align='right'>Giá gốc</th><th width='20%' align='right'>Giá giảm</th><th width='20%' align='right'>Số lượng</th><th width='20%' align='right'>Thành tiền</th></tr>");
 			stringBuilder.append("</tbody></table><div class='showboxcart' id='contentcart'><table cellpadding='2' cellspacing='0' width='100%' class='productscart'><tbody>");
-			int sumMoney = 0;
-			for (DetailOrder detailOrder : listDetailOrder) {
-				Book bookInCart = bookDao.getItem(detailOrder.getId_pro());
-				int bookId = bookInCart.getBid();
-				stringBuilder.append("<tr id='proAdd" + bookId + "'><td nowrap='nowrap'>");
-				stringBuilder.append("<img src='" + request.getContextPath() + "/files/" + bookInCart.getPicture() + "' width='40' height='50' alt='" + bookInCart.getBook_name() + "'> ");
-				stringBuilder.append("</td>");
-				stringBuilder.append("<td><div class='productname'> ");
-				stringBuilder.append("<a href='" + request.getContextPath() + "/sach-truyen/" + bookId +"/"+ SlugUtil.makeSlug(bookInCart.getBook_name()) + ".html' title='" + bookInCart.getBook_name() + "'>" + bookInCart.getBook_name() + "</a></div></td>");
-				stringBuilder.append("<td align='right' width='20%'><div class='sprice' style='text-decoration: line-through;' id='price2910'> ");
-				stringBuilder.append((int)bookInCart.getPrice());
-				stringBuilder.append("₫</div></td>");
-				stringBuilder.append("<td align='right' width='20%'><div class='sprice' id='price" + bookId + "'> ");
-				int realPrice = (int)(bookInCart.getPrice() - bookInCart.getSale() * bookInCart.getPrice() / 100);
-				stringBuilder.append(realPrice);
-				stringBuilder.append("₫</div></td>");
-				stringBuilder.append("<td class='quantity' align='right' width='20%'><input name='quantity2910' onkeydown='validateUserInput();' type='number' size='3' maxlength='3' class='small' value='" + detailOrder.getQty() + "' onkeyup='changeQty( " + bookInCart.getBid() + " , this.value);' onchange='changeQty(" + bookInCart.getBid() + " , this.value);' autocomplete='off'><div style='padding-right:15px'><a href='javascript:' onclick='changeQty(" + bookId  + ", 0);'>Xóa</a></div></td><td align='right' width='20%'><span id='cart-intoMoney" + bookId + "'>");
-				stringBuilder.append(realPrice * detailOrder.getQty());
-				stringBuilder.append(" ₫</span></td></tr>");
-				sumMoney += realPrice * detailOrder.getQty();
-			}
+			
+			
+			
+			stringBuilder.append(stringBuilder2.toString());
 			stringBuilder.append("</tbody></table></div>");
 			stringBuilder.append("<table cellpadding='2' cellspacing='1' width='100%'><tbody>");
 			stringBuilder.append("<tr id='couponvalue' style='display:none'><td class='cardtool'><b>Ưu đãi</b></td><td class='cart-subtotal cardtool'><span id='cart-coupon'>0 ₫</span></td></tr><tr><td class='cardtool'><b>Thành tiền:</b></td><td class='cart-subtotal cardtool'><span id='cart-total'><b> ");
@@ -158,10 +203,14 @@ public class PublicProductController {
 		request.setCharacterEncoding("UTF-8");
 		HttpSession session = request.getSession();
 		List<DetailOrder> listDetailOrder = (List<DetailOrder>) session.getAttribute("listDetailOrder");
+		if (listDetailOrder == null) {
+			return new ResponseForUpdate(0,0,0,false);
+		}
 		int numPro = 0;
 		long sumMoney = 0;
 		long retainMoney = 0;
 		DetailOrder detailOrderRemove = null;
+		boolean haveErrorNumber = false;
 		for (DetailOrder detailOrder : listDetailOrder) {
 			if(detailOrder.getId_pro() == id) {
 				if (soLuongMoi <= 0) {
@@ -169,12 +218,18 @@ public class PublicProductController {
 				} else {
 					detailOrder.setQty(soLuongMoi);
 					Book pro = bookDao.getItem(id);
+					if (pro.getNumber_rest() < detailOrder.getQty()) {
+						haveErrorNumber = true;
+					}
 					retainMoney =  (int)(pro.getPrice() - pro.getPrice() * pro.getSale() / 100) * soLuongMoi;
 					sumMoney += retainMoney;
 					numPro += 1;
 				}
 			} else {
 				Book pro = bookDao.getItem(detailOrder.getId_pro());
+				if (pro.getNumber_rest() < detailOrder.getQty()) {
+					haveErrorNumber = true;
+				}
 				sumMoney += (int)(pro.getPrice() - pro.getPrice() * pro.getSale() / 100) * detailOrder.getQty();
 				numPro += 1;
 			}
@@ -190,19 +245,52 @@ public class PublicProductController {
 			session.setAttribute("numProduct", listDetailOrder.size());
 		}
 		
-		return new ResponseForUpdate(sumMoney, numPro, retainMoney);
+		return new ResponseForUpdate(sumMoney, numPro, retainMoney, haveErrorNumber);
 		
+	}
+	
+	@RequestMapping(value = "huy-don-hang", method = RequestMethod.POST)
+	public @ResponseBody String huyDonHang(@RequestParam("orderId") int id, HttpServletResponse response, HttpServletRequest request) throws IOException {
+		response.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
+		HttpSession session = request.getSession();
+		if (session.getAttribute("objUserLogin") != null) {
+			User user = (User) session.getAttribute("objUserLogin");
+			if (orderDao.huyDonHang(id,user.getId()) > 0) {
+				List<DetailOrder> listDetailOrder = detailOrderDao.getItemsByIdOrder(id);
+				StringBuilder stringBuilder = new StringBuilder();
+				for (DetailOrder detailOrder : listDetailOrder) {
+					bookDao.subNum(-detailOrder.getQty(), detailOrder.getId_pro());
+					stringBuilder.append(detailOrder.getId_pro());
+					stringBuilder.append(" ");
+				}
+				removeOrderToApi(stringBuilder.toString(), user.getId(), id);
+				return "OK";
+			};
+		}
+		
+		return "NOT OK";
+	}
+	
+	private void removeOrderToApi(String stringArray, int idUser, int idOrder) {
+		LinkedMultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+		params.add("list_id_book", stringArray);
+		params.add("id_user", idUser);
+		params.add("id_order", idOrder);
+		CallApiService.getInstance().callPostFromRecommendServer(params, "/cancelBuyBook");
 	}
 	
 	public class ResponseForUpdate {
 		private long sumMoney;
 		private int numProduct;
 		private long retainMoney;
+		private boolean haveErrorNumber;
 		
-		public ResponseForUpdate(long money, int numPro, long moneyRetain) {
+		public ResponseForUpdate(long money, int numPro, long moneyRetain, boolean haveError) {
 			sumMoney = money;
 			numProduct = numPro;
 			retainMoney = moneyRetain;
+			haveErrorNumber = haveError;
 		}
 	}
 	
@@ -274,35 +362,35 @@ public class PublicProductController {
 //		}
 //	}
 //
-//	@RequestMapping(value = "thong-ke", method = RequestMethod.POST, produces = "text/html ; charset=UTF-8")
-//	public @ResponseBody String active(@RequestParam("month") int month,@RequestParam("year") int year,HttpServletResponse response, HttpServletRequest request) throws IOException {
-//		response.setCharacterEncoding("UTF-8");
-//		request.setCharacterEncoding("UTF-8");
-//		List<Order> listOrder = null;
-//		if(month == 0) {
-//			listOrder = orderDao.getItemsByYear(year);
-//		}
-//		else
-//		{
-//			listOrder = orderDao.getItemsByMothAndYear(month, year);
-//		}
-//		float tongTien = 0;
-//		String ketqua = "";
-//		ketqua += "<table id='table'><thead><tr><th>ID</th><th>Tổng tiền</th><th>Xem chi tiết</th></tr></thead><tbody>";
-//		for (Order order : listOrder) {
-//			tongTien += order.getAmount();
-//			ketqua += "<tr><td>";
-//			ketqua += order.getId_order();
-//			ketqua += "</td><td>";
-//			ketqua += order.getAmount();
-//			ketqua += "$</td><td>";
-//			ketqua += "<a href='" + request.getContextPath() + "/admin/order/view/" + order.getId_order() + "' title='' class='btn btn-primary'><span class='glyphicon glyphicon-eye-open '></span> Xem</a></td></tr>";
-//		}
-//		
-//		ketqua += "</tbody></table><br><div style='color:green;float: right' >Tổng tiền : " + tongTien + "$</div><br>";
-//		
-//		
-//		
-//		return ketqua;
-//	}
+	@RequestMapping(value = "thong-ke", method = RequestMethod.POST, produces = "text/html ; charset=UTF-8")
+	public @ResponseBody String active(@RequestParam("month") int month,@RequestParam("year") int year,HttpServletResponse response, HttpServletRequest request) throws IOException {
+		response.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
+		List<Order> listOrder = null;
+		if(month == 0) {
+			listOrder = orderDao.getItemsByYear(year);
+		}
+		else
+		{
+			listOrder = orderDao.getItemsByMothAndYear(month, year);
+		}
+		float tongTien = 0;
+		String ketqua = "";
+		ketqua += "<table id='table'><thead><tr><th>ID</th><th>Tổng tiền</th><th>Xem chi tiết</th></tr></thead><tbody>";
+		for (Order order : listOrder) {
+			tongTien += order.getAmount();
+			ketqua += "<tr><td>";
+			ketqua += order.getId_order();
+			ketqua += "</td><td>";
+			ketqua += String.format("%,.0f", order.getAmount());
+			ketqua += "đ</td><td>";
+			ketqua += "<a href='" + request.getContextPath() + "/admin/order/view/" + order.getId_order() + "' title='' class='btn btn-primary'><span class='glyphicon glyphicon-eye-open '></span> Xem</a></td></tr>";
+		}
+		
+		ketqua += "</tbody></table><br><div style='color:green;float: right' >Tổng tiền : " + String.format("%,.0f",tongTien) + "đ</div><br>";
+		
+		
+		
+		return ketqua;
+	}
 }

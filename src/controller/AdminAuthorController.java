@@ -44,12 +44,15 @@ public class AdminAuthorController {
 			modelMap.addAttribute("author", author);
 			return "admin.author.add";
 		}
-		if (authorDao.addAuthor(author) > 0) {
-			ra.addFlashAttribute("msg", Defines.SUCCESS);
-		}else {
-			ra.addFlashAttribute("msg", Defines.ERROR);
+		if (authorDao.getAuthorByName(author.getName()) == null) {
+			if (authorDao.addAuthor(author) > 0) {
+				ra.addFlashAttribute("msg", Defines.SUCCESS);
+			}else {
+				ra.addFlashAttribute("msg", Defines.ERROR);
+			}
+		} else {
+			ra.addFlashAttribute("msg", "TÊN AUTHOR ĐÃ TỒN TẠI");
 		}
-		
 		return "redirect:/admin/authors";
 			
 	}
@@ -78,12 +81,15 @@ public class AdminAuthorController {
 			return "admin.author.edit";
 		}
 		author.setAid(id);
-		if(authorDao.editItem(author)>0) {
-			ra.addFlashAttribute("msg", Defines.SUCCESS);
-		}else {
-			ra.addFlashAttribute("msg", Defines.ERROR);
+		if (authorDao.getAuthorByName(author.getName()) == null) {
+			if(authorDao.editItem(author)>0) {
+				ra.addFlashAttribute("msg", Defines.SUCCESS);
+			}else {
+				ra.addFlashAttribute("msg", Defines.ERROR);
+			}
+		} else {
+			ra.addFlashAttribute("msg", "TÊN AUTHOR ĐÃ TỒN TẠI");
 		}
-		
 		return "redirect:/admin/authors";
 			
 	}

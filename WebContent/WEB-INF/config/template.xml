@@ -280,6 +280,9 @@
 	<definition name="public.book.checkend" extends="public.template">
 		<put-attribute name="body" value="/WEB-INF/jsp/public/checkend.jsp" />
 	</definition>
+	<definition name="public.book.errorNumbber" extends="public.template">
+		<put-attribute name="body" value="/WEB-INF/jsp/public/errorNumbber.jsp" />
+	</definition>
 	<definition name="public.book.finishorder" extends="public.template">
 		<put-attribute name="body" value="/WEB-INF/jsp/public/finishorder.jsp" />
 	</definition>

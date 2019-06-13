@@ -32,13 +32,13 @@
 								title="${objBook.publisher_name }">${objBook.publisher_name }</a>
 							</span>
 						</div>
-						<div class="booktype_contener">
+					<!-- 	<div class="booktype_contener">
 							<div class="booktype_left">Hình thức:</div>
 							<div class="booktype  first">
 								<a href="" title="Bìa Mềm">Bìa Mềm</a>
 							</div>
 							<div class="clear"></div>
-						</div>
+						</div> -->
 						<div class="clear"></div>
 					</div>
 
@@ -58,28 +58,31 @@
 							</div>
 						</div>
 						<div class="goshop">
+							<c:if test="${objBook.number_rest <= 0 }">
+								<a class="disable" style="background-color: grey"  href="javascript:void(0)">Đã hết hàng</a>
+							</c:if>
+							<c:if test="${objBook.number_rest > 0 }">
 							<a href="javascript:void(0)" onclick="return addCart();">Mua
 								ngay</a>
+							</c:if>
 						</div>
 						<div class="clear"></div>
 					</div>
 					<div class="clear"></div>
+					
+					
 
 
 					<div class="clear"></div>
 					<div class="intro">
 						<div class="block " id="content_ViewProducts">
 							<div class="blockcontent">
+								Số sách còn : ${objBook.number_rest }
+							</div>
+							<div class="blockcontent">
 								<p>
 									<i class="fa fa-check"></i><span style="font-size: 14px;">Bọc
 										Plastic miễn ph&iacute;&nbsp;</span>
-								</p>
-								<p>
-									<i class="fa fa-check"></i><span style="font-size: 14px;">Giao
-										h&agrave;ng miễn ph&iacute; trong nội th&agrave;nh TP. HCM với
-										đơn h&agrave;ng&nbsp; <span style="color: #33cc33;"><strong>&ge;
-												150.000 đ</strong></span>
-									</span>
 								</p>
 								<p>
 									<i class="fa fa-check"></i><span style="font-size: 14px;">Giao
@@ -184,7 +187,13 @@
 				</tr>
 			</table>
 			<div class="goshop cfields">
-				<a href="javascript:" onclick="addCart();">Mua ngay</a>
+				<c:if test="${objBook.number_rest <= 0 }">
+					<a class="disable" style="background-color: grey"  href="javascript:void(0)">Đã hết hàng</a>
+				</c:if>
+				<c:if test="${objBook.number_rest > 0 }">
+					<a href="javascript:void(0)" onclick="return addCart();">Mua
+								ngay</a>
+				</c:if>
 			</div>
 			<!-- <script type="text/javascript">
 			function ajaxtest() {

@@ -59,16 +59,13 @@
 			<div class="clear"></div>
 			<div id="oder_footer">
 				<div class="fleft">
-					Bạn cần hỗ trợ? Gọi HotLine: <b>097. 4941. 097</b>
+					Bạn cần hỗ trợ? Gọi HotLine: <b>098. 4946. 627</b>
 				</div>
 				<div class="oder_footer_menu">
 					<ul>
 						<li class="First"><a href="/" title="Trang chủ"
 							target="_self">Trang chủ</a></li>
-						<li class="nomal"><a
-							href="/contents/danh-muc/2/cau-hoi-thuong-gap.html"
-							title="Câu hỏi thường gặp" target="_self">Câu hỏi thường gặp</a>
-						</li>
+
 					</ul>
 				</div>
 			</div>

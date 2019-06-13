@@ -1,5 +1,6 @@
 package model.dao;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class BookDao {
 				+ "FROM book AS b INNER JOIN categories AS c ON b.category_id = c.cid "
 				+ "INNER JOIN author AS au ON b.author_id = au.aid "
 				+ "INNER JOIN publisher AS p ON b.publisher_id = p.pid "
-				+ "ORDER BY b.bid LIMIT ?, ?";
+				+ "ORDER BY b.bid DESC LIMIT ?, ?";
 		return jdbcTemplate.query(sql, new Object[] { offset, Defines.ROW_COUNT },
 				new BeanPropertyRowMapper<Book>(Book.class));
 	}
@@ -90,6 +91,15 @@ public class BookDao {
 		return jdbcTemplate.query(sql, new Object[] {nameBook, Defines.ROW_COUNT * (currentPage - 1), Defines.ROW_COUNT },
 				new BeanPropertyRowMapper<Book>(Book.class));
 	}
+	public List<Book> getBookSearchName(String nameBook) {
+		String sql = "SELECT au.name AS author_name, p.name AS publisher_name, c.cname AS category_name, b.* "
+				+ "FROM book AS b INNER JOIN categories AS c ON b.category_id = c.cid "
+				+ "INNER JOIN author AS au ON b.author_id = au.aid "
+				+ "INNER JOIN publisher AS p ON b.publisher_id = p.pid "
+				+ " WHERE b.book_name LIKE CONCAT('%',?,'%') ORDER BY b.realease_date ASC";
+		return jdbcTemplate.query(sql, new Object[] {nameBook },
+				new BeanPropertyRowMapper<Book>(Book.class));
+	}
 	
 	public List<Book> getItemsRunningOut() {
 		String sql = "SELECT au.name AS author_name, p.name AS publisher_name, c.cname AS category_name, b.* "
@@ -97,7 +107,7 @@ public class BookDao {
 				+ "INNER JOIN author AS au ON b.author_id = au.aid "
 				+ "INNER JOIN publisher AS p ON b.publisher_id = p.pid "
 				+ "WHERE number_rest < 10";
-		return jdbcTemplate.query(sql,
+		return jdbcTemplate.query(sql, new Object[] {},
 				new BeanPropertyRowMapper<Book>(Book.class));
 	}
 	
@@ -226,7 +236,7 @@ public class BookDao {
 	
 	public int countItemsRunningOut() {
 		String sql = "SELECT COUNT(bid) AS countItem FROM book WHERE number_rest < 10";
-		return jdbcTemplate.queryForObject(sql, Integer.class);
+		return jdbcTemplate.queryForObject(sql,new Object[] {}, Integer.class);
 	}
 	
 	public int countItemByIdCat(int id_cat) {

@@ -46,6 +46,16 @@ public class PublisherDao {
 		return null;
 	}
 	
+	public Publisher getPublisherByName(String name) {
+		try {
+			String sql = "SELECT * FROM publisher WHERE name = ?";
+			return jdbcTemplate.queryForObject(sql, new Object[] {name},new BeanPropertyRowMapper<Publisher>(Publisher.class));
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+	
 
 	public int editItem(Publisher publisher) {
 		String sql = "UPDATE publisher SET name = ? WHERE pid = ?";

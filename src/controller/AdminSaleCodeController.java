@@ -17,7 +17,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import constant.Defines;
 import model.bean.Order;
 import model.bean.SaleCode;
-import model.dao.ContactDao;
 import model.dao.OrderDao;
 import model.dao.SaleCodeDao;
 
@@ -31,8 +30,6 @@ public class AdminSaleCodeController {
 	
 	@Autowired
 	private Defines defines;
-	@Autowired
-	private ContactDao contactDao;
 	
 	@ModelAttribute
 	public void commonObjects(ModelMap modelMap) {

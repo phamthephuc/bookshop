@@ -3,53 +3,52 @@
 <%@include file="/templates/taglib.jsp" %>
 		<div class="main-grid">
 			<div class="agile-grids">	
-				<!-- tables -->
-				
+				<!-- tables -->		
 				<div class="table-heading">
-					<h2>Sản Phẩm</h2>
-					<c:if test="${not empty msg }">
-						<h3 style="text-align: center;" class="label label-success">${msg }</h3>
+					<c:if test="${listBooks.size() == 0 }">
+						<h2 style="color: red">KHÔNG TÌM THẤY KẾT QUẢ</h2>
 					</c:if>
 				</div>
 				
+				<c:if test="${listBooks.size() > 0 }">
 				<div class="agile-tables">
 					<div class="w3l-table-info">
-					
-					  <h3 ><a class="label label-info" href="${pageContext.request.contextPath }/admin/pro/add">Thêm sản phẩm</a></h3>
 					    <table id="table">
 						<thead>
 						  <tr>
-							<th>ID</th>
-							<th>Tên sản phẩm</th>
-							<th>danh mục</th>
-							<th>danh mục cha</th>
-							<th>Số lượng còn</th>
+							<th>Tên Sách</th>
+							<th>Danh mục</th>
+							<th>Tên tác giả</th>
+							<th>Tên nhà xuất bản</th>
 							<th>Giá gốc</th>
-							<th >Hình 1</th>
-							<th>Hình 2</th>
-							<th>Hình 3</th>
-							<th>Giá khi giảm</th>
-							<th>Loại dây</th>
-							<th >Chức năng</th>
+							<th>Giá sau khi giảm</th>
+							<th>Ngày xuất bản</th>
+							<th>Hình ảnh</th>
+							<th>Số sách còn lại</th>
+							<th>Số trang</th>
+							<th>Tình trạng</th>
+							<th>Chức năng</th>
 						  </tr>
 						</thead>
 						<tbody>
-						<c:forEach items="${listProduct }" var="pro">
+						<c:forEach items="${listBooks }" var="book">
 						  <tr>
-							<td>${pro.id_pro }</td>
-							<td>${pro.name_pro }</td>
-							<td>${pro.cname }</td>
-							<td>${pro.cname_parent }</td>
-							<td>${pro.number_rest }</td>
-							<td>${pro.price }</td>
-							<td ><img width="100px" src="${pageContext.request.contextPath}/files/${pro.pic1 }"></td>
-							<td ><img width="100px"  src="${pageContext.request.contextPath}/files/${pro.pic2 }"></td>
-							<td ><img width="100px" src="${pageContext.request.contextPath}/files/${pro.pic3 }"></td>
-							<td>${pro.price - pro.price * pro.sale / 100 }</td>
-							<td>${pro.name_type}</td>
+							<td>${book.book_name }</td>
+							<td>${book.category_name }</td>
+							<td>${book.author_name}</td>
+							<td>${book.publisher_name }</td>
+							<td><fmt:formatNumber type="number" value='${book.price }'/>đ</td>
+							<td><fmt:formatNumber type="number" value='${book.price - book.price * book.sale / 100 }'/>đ</td>
+							<fmt:formatDate value="${book.realease_date}" var="dateFormat" pattern="dd/MM/yyyy"/>
+							<td>${dateFormat}</td>
+							<td ><img width="100px" src="${pageContext.request.contextPath}/files/${book.picture }"></td>
+							<td>${book.number_rest}</td>
+							<td>${book.pages}</td>
+							<td>${book.is_active}</td>
 							<td>
-								 <a href="${pageContext.request.contextPath }/admin/pro/edit/${pro.id_pro }" title="" class="btn btn-primary"><span class="glyphicon glyphicon-pencil "></span> Sửa</a>
-	                             <a href="${pageContext.request.contextPath }/admin/pro/del/${pro.id_pro }" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này không?')" title="" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Xóa</a>
+								 <a href="${pageContext.request.contextPath }/admin/book/edit/${book.bid }" title="" class="btn btn-primary"><span class="glyphicon glyphicon-pencil "></span></a>
+	                             <a href="${pageContext.request.contextPath }/admin/book/del/${book.bid }" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này không?')" title="" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+	                             <a href="${pageContext.request.contextPath }/admin/book/addNum/${book.bid }" title="" class="btn btn-info"><span class="glyphicon glyphicon-plus-sign"></span></a>
 							</td>
 						  </tr>
 						</c:forEach>
@@ -57,9 +56,38 @@
 					  </table>
 					</div>
 			
-				  
+				  <!-- Pagination -->
+                           <%--  <nav class="text-center" aria-label="...">
+                                <ul class="pagination">
+                                    <c:if test="${page > 1 }">
+		                            <li>
+		                                <a href="${pageContext.request.contextPath }/admin/books/${page - 1}">
+		                                    << </a>
+		                            </li>
+		                        </c:if>
+		                        	<c:if test="${sumPage > 1 }">
+		                            <c:forEach begin="1" end="${sumPage }" var="i">
+		                            	<c:if test="${page == i }">
+		                            		<li><a style="background-color: yellow;" href="${pageContext.request.contextPath }/admin/books/${i}">${i }</a></li>
+		                            	</c:if>
+		                            	<c:if test="${page != i }">
+		                            		<li><a href="${pageContext.request.contextPath }/admin/books/${i}">${i }</a></li>
+		                            	</c:if>
+		                                    	
+		                            </c:forEach>
+		                            </c:if>
+								<c:if test="${page < sumPage }">
+		                            <li>
+		                                <a href="${pageContext.request.contextPath }/admin/books/${page + 1}">
+		                                    >> </a>
+		                            </li>
+		                        </c:if>
+                                </ul>
+                            </nav> --%>
+                  <!-- /.pagination -->
 
 				</div>
+				</c:if>
 				<!-- //tables -->
 				
 				<!-- tables -->

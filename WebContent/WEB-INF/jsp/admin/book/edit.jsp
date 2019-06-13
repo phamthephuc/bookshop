@@ -47,22 +47,24 @@
 												</c:forEach>
 											</select>
 											<label for="exampleInputEmail1">Giá bán</label> 
-											<input type="number" step="1" name="price" value="${book.price }" class="form-control" id="exampleInputEmail1" placeholder="giá bán" required="required" min="0" requiredmsg="Trường này là số lớn hơn 0">
+											<input type="number" step="1" name="price" value="${slugUtil.formatPrice(book.price) }" class="form-control" id="exampleInputEmail1" placeholder="giá bán" required="required" min="0" requiredmsg="Trường này là số lớn hơn 0">
 											<label for="exampleInputEmail1">Giảm giá</label> 
 											<input type="number" step="1" name="sale" value="${book.sale }" class="form-control" id="exampleInputEmail1" placeholder="phần trăm giảm giá" required="required" min="0" max="100" requiredmsg="Trường này là số lớn hơn 0 nhỏ hơn 100">
 											<label for="exampleInputEmail1">Số trang</label> 
 											<input type="number" step="1" name="pages" value="${book.pages }" class="form-control" id="exampleInputEmail1" placeholder="số lượng" required="required" min="0" requiredmsg="Trường này là số lớn hơn 0">
 											<label for="exampleInputEmail1">Ngày xuất bản</label>
 											<input type="date" name="realease_date" value='${book.realease_date}' class="form-control" required="date" requiredmsg="Trường này cần là định dạng ngày">
+											<input type="hidden" name="number_rest" value='${book.number_rest}' class="form-control">
+											<input type="hidden" name="number_start" value='${book.number_start}' class="form-control">
 											<label for="exampleInputEmail1">Mô tả</label> 
-											<textarea name="preview" class="form-control"  required="required" minlength="20" maxlength="2000"  requiredmsg="Trường này có từ 20 đến 2000 ký tự">${book.preview}</textarea>
+											<textarea id="ckeditor" name="preview" class="form-control"  required="required" minlength="20" maxlength="2000"  requiredmsg="Trường này có từ 20 đến 2000 ký tự">${book.preview}</textarea>
 											<label for="exampleInputEmail1">Hình ảnh</label>
 											<img alt="" width="100px" src="${pageContext.request.contextPath }/files/${book.picture }">
 											<input type="file" name="hinh" class="form-control" id="exampleInputEmail1" placeholder="tên danh mục">
 											<label for="exampleInputEmail1">Tình trạng</label> 
-											<select class="form-control" id="exampleInputEmail1">
-												<option <c:if test="${book.is_active == true }">selected="selected"</c:if> value="true">Cho phép hiển thị</option>
-												<option <c:if test="${book.is_active == false }">selected="selected"</c:if> value="false">Ẩn</option>
+											<select name="is_active" class="form-control" id="exampleInputEmail1">
+												<option <c:if test="${book.is_active == true }">selected="selected"</c:if> value="1">Cho phép hiển thị</option>
+												<option <c:if test="${book.is_active == false }">selected="selected"</c:if> value="0">Ẩn</option>
 											</select>
 										</div> 
 										<button type="submit" class="btn btn-default w3ls-button">Submit</button> 

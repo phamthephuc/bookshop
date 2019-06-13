@@ -26,6 +26,12 @@ public class CategoryDao {
 		return jdbcTemplate.query(sql, new BeanPropertyRowMapper<Category>(Category.class));
 	}
 	
+	public List<Category> getItemsParentDifferentCurrentId(int id){
+		String sql = "SELECT * FROM categories WHERE id_parent = 0 AND cid != ? ORDER BY cid DESC;";
+		return jdbcTemplate.query(sql,new Object[] {id}, new BeanPropertyRowMapper<Category>(Category.class));
+	}
+	
+	
 	public List<Category> getItemsChilds(){
 		String sql = "SELECT chil.*,parent.cname AS name_parent FROM categories AS chil INNER JOIN categories AS parent ON chil.id_parent = parent.cid WHERE chil.id_parent != 0 ORDER BY chil.cid DESC ";
 		return jdbcTemplate.query(sql, new BeanPropertyRowMapper<Category>(Category.class));
